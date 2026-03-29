@@ -75,14 +75,14 @@ public class StudentController
     }
 
     @Operation(
-            summary = "Get student by PAN number",
-            description = "Fetches a student by their PAN number.",
+            summary = "Get student by PEN number",
+            description = "Fetches a student by their PEN number.",
             parameters = {
-                    @Parameter(name = "panNumber", description = "PAN number of the student", required = true)
+                    @Parameter(name = "panNumber", description = "PEN number of the student", required = true)
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Student fetched successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid PAN or student not found", content = @Content)
+                    @ApiResponse(responseCode = "400", description = "Invalid PEN or student not found", content = @Content)
             }
     )
     @GetMapping("/{panNumber}")
@@ -156,9 +156,9 @@ public class StudentController
 
     @Operation(
             summary = "Update student information",
-            description = "Updates information for active students identified by PAN number.",
+            description = "Updates information for active students identified by PEN number.",
             parameters = {
-                    @Parameter(name = "panNumber", description = "PAN number of the student", required = true)
+                    @Parameter(name = "panNumber", description = "PEN number of the student", required = true)
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Student updated successfully"),
@@ -240,7 +240,7 @@ public class StudentController
 
     @Operation(
             summary = "Update students status",
-            description = "Mark multiple students as graduate or inactive based on PAN numbers.",
+            description = "Mark multiple students as graduate or inactive based on PEN numbers.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Students marked successfully"),
                     @ApiResponse(responseCode = "400", description = "Invalid request or student status", content = @Content)
@@ -265,10 +265,10 @@ public class StudentController
 
     @Operation(
             summary = "Promote students to another class",
-            description = "Promotes a list of active students (by PAN) to a given class in the active session.",
+            description = "Promotes a list of active students (by PEN) to a given class in the active session.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Students promoted successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid class ID or some PANs inactive/missing", content = @Content)
+                    @ApiResponse(responseCode = "400", description = "Invalid class ID or some PENs inactive/missing", content = @Content)
             }
     )
     @PutMapping("/promote-to/{classId}")
@@ -353,8 +353,8 @@ public class StudentController
     )
     @PutMapping("/swap-roll-numbers")
     public ResponseEntity<RestResponse<Void>> swapRollNumbers(
-            @Parameter(description = "PAN of first student") @RequestParam String panNumber1,
-            @Parameter(description = "PAN of second student") @RequestParam String panNumber2,
+            @Parameter(description = "PEN of first student") @RequestParam String panNumber1,
+            @Parameter(description = "PEN of second student") @RequestParam String panNumber2,
             @RequestAttribute("schoolId") Long schoolId) {
         studentService.swapRollNumbers(panNumber1, panNumber2, schoolId);
 

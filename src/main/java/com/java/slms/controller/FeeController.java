@@ -101,12 +101,12 @@ public class FeeController
     }
 
     @Operation(
-            summary = "Get fee catalog by student PAN",
-            description = "Fetches the fee catalog for a student identified by PAN number.",
+            summary = "Get fee catalog by student PEN",
+            description = "Fetches the fee catalog for a student identified by PEN number.",
             parameters = @Parameter(name = "schoolId", hidden = true),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Fee catalog retrieved successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid PAN or student not found", content = @Content)
+                    @ApiResponse(responseCode = "400", description = "Invalid PEN or student not found", content = @Content)
             }
     )
     @GetMapping("/catalogs/{panNumber}")

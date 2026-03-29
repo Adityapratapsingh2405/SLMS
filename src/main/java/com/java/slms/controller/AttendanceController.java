@@ -86,10 +86,10 @@ public class AttendanceController
     }
 
     @Operation(
-            summary = "Get attendance records by student PAN, session, and optionally by month",
+            summary = "Get attendance records by student PEN, session, and optionally by month",
             description = "Fetch attendance records for a student in a specified session and optional month filter.",
             parameters = {
-                    @Parameter(name = "pan", description = "PAN number of the student", required = true),
+                    @Parameter(name = "pan", description = "PEN number of the student", required = true),
                     @Parameter(name = "sessionId", description = "ID of the session", required = true),
                     @Parameter(name = "month", description = "Month for attendance filter (optional)"),
                     @Parameter(name = "schoolId", description = "School ID", required = true, in = ParameterIn.DEFAULT)
@@ -160,7 +160,7 @@ public class AttendanceController
         return ResponseEntity.ok(
                 RestResponse.<List<AttendanceInfoDto>>builder()
                         .data(records)
-                        .message("Attendance records fetched for PAN: " + panNumber)
+                        .message("Attendance records fetched for PEN: " + panNumber)
                         .status(HttpStatus.OK.value())
                         .build()
         );

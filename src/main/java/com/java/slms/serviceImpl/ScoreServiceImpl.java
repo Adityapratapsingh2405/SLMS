@@ -76,7 +76,7 @@ public class ScoreServiceImpl implements ScoreService
             if (!isEnrolled)
             {
                 log.error("Student with PAN '{}' is not enrolled in class '{}'.", panNumber, classEntity.getClassName());
-                throw new ResourceNotFoundException("Student with PAN '" + panNumber + "' is not enrolled in class '" + classEntity.getClassName() + "'.");
+                throw new ResourceNotFoundException("Student with PEN '" + panNumber + "' is not enrolled in class '" + classEntity.getClassName() + "'.");
             }
 
             // Check for existing score
@@ -128,7 +128,7 @@ public class ScoreServiceImpl implements ScoreService
 
         if (scores.isEmpty())
         {
-            log.error("No scores found for student with PAN: {}", panNumber);
+            log.error("No scores found for student with PEN: {}", panNumber);
             throw new ResourceNotFoundException("No scores found for student with PAN: " + panNumber);
         }
 
@@ -207,8 +207,8 @@ public class ScoreServiceImpl implements ScoreService
         boolean isEnrolled = studentRepository.existsByClassNameAndPanNumberIgnoreCase(classEntity.getClassName(), panNumber);
         if (!isEnrolled)
         {
-            log.error("Student with PAN '{}' is not enrolled in class '{}'.", panNumber, classEntity.getClassName());
-            throw new ResourceNotFoundException("Student with PAN '" + panNumber + "' is not enrolled in class '" + classEntity.getClassName() + "'.");
+            log.error("Student with PEN '{}' is not enrolled in class '{}'.", panNumber, classEntity.getClassName());
+            throw new ResourceNotFoundException("Student with PEN '" + panNumber + "' is not enrolled in class '" + classEntity.getClassName() + "'.");
         }
 
         // Fetch the existing Score by composite keys: studentPanNumber, subjectId, examId and classId filtered via Subject.classEntity
@@ -292,7 +292,7 @@ public class ScoreServiceImpl implements ScoreService
         boolean isEnrolled = studentRepository.existsByClassNameAndPanNumberIgnoreCase(classEntity.getClassName(), panNumber);
         if (!isEnrolled)
         {
-            String message = String.format("Student with PAN '%s' is not enrolled in class '%s'.", panNumber, classEntity.getClassName());
+            String message = String.format("Student with PEN '%s' is not enrolled in class '%s'.", panNumber, classEntity.getClassName());
             log.error(message);
             throw new ResourceNotFoundException(message);
         }

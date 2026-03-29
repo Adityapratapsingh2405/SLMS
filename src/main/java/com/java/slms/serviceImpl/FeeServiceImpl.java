@@ -49,7 +49,7 @@ public class FeeServiceImpl implements FeeService
     {
         Student student = studentRepository
                 .findByPanNumberIgnoreCaseAndSchool_Id(feeRequestDTO.getStudentPanNumber(), schoolId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PAN: "
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: "
                         + feeRequestDTO.getStudentPanNumber() + " in school ID: " + schoolId));
 
         Session session = sessionRepository.findBySessionIdAndSchoolId(feeRequestDTO.getSessionId(), schoolId)
@@ -105,7 +105,7 @@ public class FeeServiceImpl implements FeeService
     }
     
     /**
-     * Generate unique receipt number format: REC-{SessionYear}-{SchoolId}-{PAN}-{Timestamp}
+     * Generate unique receipt number format: REC-{SessionYear}-{SchoolId}-{PEN}-{Timestamp}
      * Example: REC-2025-1-ABC123-20251031143022
      */
     private String generateUniqueReceiptNumber(Student student, Session session)
@@ -140,7 +140,7 @@ public class FeeServiceImpl implements FeeService
     public FeeCatalogDto getFeeCatalogByStudentPanNumber(String panNumber, Long schoolId)
     {
         Student student = studentRepository.findByPanNumberIgnoreCaseAndSchool_Id(panNumber, schoolId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PAN: " + panNumber));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: " + panNumber));
 
         return buildCatalogForStudent(student, schoolId);
     }
@@ -255,18 +255,18 @@ public class FeeServiceImpl implements FeeService
     public void generateFeesForStudent(String panNumber)
     {
         Student student = studentRepository.findById(panNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PAN: " + panNumber));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: " + panNumber));
 
         ClassEntity currentClass = student.getCurrentClass();
         if (currentClass == null)
         {
-            throw new ResourceNotFoundException("Student with PAN " + panNumber + " is not enrolled in any class");
+            throw new ResourceNotFoundException("Student with PEN " + panNumber + " is not enrolled in any class");
         }
 
         Session session = student.getSession();
         if (session == null)
         {
-            throw new ResourceNotFoundException("Student with PAN " + panNumber + " is not enrolled in any session");
+            throw new ResourceNotFoundException("Student with PEN " + panNumber + " is not enrolled in any session");
         }
 
         // Check if fees already exist for this student in this session

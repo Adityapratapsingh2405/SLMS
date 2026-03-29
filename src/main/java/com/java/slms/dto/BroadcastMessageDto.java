@@ -16,7 +16,7 @@ public class BroadcastMessageDto
 {
     private String title;
     private String message;
-    private List<String> recipientIds; // List of PAN numbers or emails
+    private List<String> recipientIds; // List of PEN numbers or emails
     private Notification.RecipientType recipientType;
     private Notification.NotificationPriority priority;
 }

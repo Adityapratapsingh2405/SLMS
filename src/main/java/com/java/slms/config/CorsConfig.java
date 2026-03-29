@@ -18,6 +18,8 @@ public class CorsConfig {
         
         // Allow specific origins (frontend URLs)
         configuration.setAllowedOrigins(Arrays.asList(
+	    "http://3.110.94.0",
+	    "http://classconnect.it.com",
             "http://localhost:3000",  // React development server
             "http://localhost:3001",  // Alternative React port
             "http://127.0.0.1:3000",

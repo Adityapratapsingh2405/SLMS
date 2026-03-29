@@ -40,7 +40,7 @@ public class TransferCertificateServiceImpl implements TransferCertificateReques
 
         Student student = studentRepository.findByPanNumberIgnoreCaseAndSchool_IdAndStatusActive(studentPan, schoolId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Student not found with PAN Number: " + studentPan +
+                        "Student not found with PEN Number: " + studentPan +
                                 " and ACTIVE status in school with ID: " + schoolId));
 
         boolean exists = tcRequestRepository.existsByStudentAndStatusInAndSchoolId(student, List.of(RequestStatus.PENDING, RequestStatus.APPROVED), schoolId);
@@ -63,7 +63,7 @@ public class TransferCertificateServiceImpl implements TransferCertificateReques
     public List<TransferCertificateRequestDto> getAllRequestsByStudentPan(String studentPan, Long schoolId)
     {
         Student student = studentRepository.findByPanNumberIgnoreCaseAndSchool_Id(studentPan, schoolId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PAN: " + studentPan));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: " + studentPan));
 
         List<TransferCertificateRequest> tcRequests = tcRequestRepository.findByStudentAndSchoolId(student, schoolId);
 

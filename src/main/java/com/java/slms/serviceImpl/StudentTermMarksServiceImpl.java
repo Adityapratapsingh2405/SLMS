@@ -47,7 +47,7 @@ public class StudentTermMarksServiceImpl implements StudentTermMarksService
             StudentEnrollments enrollment = studentEnrollmentRepository
                     .findByClassIdAndSchoolIdAndSessionIdAndPan(classId, schoolId, session.getId(), marks.getPanNumber())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "Enrollment not found for PAN: " + marks.getPanNumber() +
+                            "Enrollment not found for PEN: " + marks.getPanNumber() +
                                     ", classId: " + classId +
                                     ", sessionId: " + session.getId() +
                                     ", schoolId: " + schoolId));
@@ -55,7 +55,7 @@ public class StudentTermMarksServiceImpl implements StudentTermMarksService
             boolean alreadyExists = studentTermMarksRepository.existsByEnrollmentAndClassExamAndSubject(enrollment, classExam, subject);
             if (alreadyExists)
             {
-                throw new AlreadyExistException("Marks already exist for student with PAN: " + marks.getPanNumber() +
+                throw new AlreadyExistException("Marks already exist for student with PEN: " + marks.getPanNumber() +
                         " in this exam and subject.");
             }
 
@@ -82,7 +82,7 @@ public class StudentTermMarksServiceImpl implements StudentTermMarksService
 
         if (termMarks.isEmpty())
         {
-            throw new ResourceNotFoundException("No marks found for student with PAN: " + panNumber);
+            throw new ResourceNotFoundException("No marks found for student with PEN: " + panNumber);
         }
 
         StudentEnrollments enrollment = termMarks.get(0).getEnrollment();
@@ -131,7 +131,7 @@ public class StudentTermMarksServiceImpl implements StudentTermMarksService
 
         if (summaries.isEmpty())
         {
-            throw new ResourceNotFoundException("No exam marks found for PAN: " + panNumber);
+            throw new ResourceNotFoundException("No exam marks found for PEN: " + panNumber);
         }
 
         return summaries;

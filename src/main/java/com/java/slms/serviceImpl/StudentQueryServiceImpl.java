@@ -64,7 +64,7 @@ public class StudentQueryServiceImpl implements StudentQueryService
         StudentQuery raisedQuery = studentQueryRepository.save(studentQuery);
         StudentQueryResponse studentQueryResponse = modelMapper.map(raisedQuery, StudentQueryResponse.class);
         studentQueryResponse.setCreatedAt(raisedQuery.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        studentQueryResponse.setStudentId(null); // Student uses PAN as ID, not a numeric ID
+        studentQueryResponse.setStudentId(null); // Student uses PEN as ID, not a numeric ID
         studentQueryResponse.setStudentName(raisedQuery.getStudent().getName());
         studentQueryResponse.setTeacherId(raisedQuery.getTeacher().getId());
         studentQueryResponse.setTeacherName(raisedQuery.getTeacher().getName());
@@ -96,7 +96,7 @@ public class StudentQueryServiceImpl implements StudentQueryService
         {
             StudentQueryResponse response = modelMapper.map(query, StudentQueryResponse.class);
             response.setCreatedAt(query.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            response.setStudentId(null); // Student uses PAN as ID, not a numeric ID
+            response.setStudentId(null); // Student uses PEN as ID, not a numeric ID
             response.setStudentName(query.getStudent().getName());
             response.setTeacherId(query.getTeacher().getId());
             response.setTeacherName(query.getTeacher().getName());
@@ -138,7 +138,7 @@ public class StudentQueryServiceImpl implements StudentQueryService
 
         StudentQueryResponse response = modelMapper.map(updatedQuery, StudentQueryResponse.class);
         response.setCreatedAt(query.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        response.setStudentId(null); // Student uses PAN as ID, not a numeric ID
+        response.setStudentId(null); // Student uses PEN as ID, not a numeric ID
         response.setStudentName(updatedQuery.getStudent().getName());
         response.setTeacherId(updatedQuery.getTeacher().getId());
         response.setTeacherName(updatedQuery.getTeacher().getName());
@@ -169,7 +169,7 @@ public class StudentQueryServiceImpl implements StudentQueryService
         {
             StudentQueryResponse response = modelMapper.map(query, StudentQueryResponse.class);
             response.setCreatedAt(query.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            response.setStudentId(null); // Student uses PAN as ID, not a numeric ID
+            response.setStudentId(null); // Student uses PEN as ID, not a numeric ID
             response.setStudentName(query.getStudent().getName());
             response.setTeacherId(query.getTeacher().getId());
             response.setTeacherName(query.getTeacher().getName());

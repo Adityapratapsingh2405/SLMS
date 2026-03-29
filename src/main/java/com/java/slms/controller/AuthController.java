@@ -216,7 +216,7 @@ public class AuthController
     public ResponseEntity<RestResponse<StudentResponseDto>> registerStudent(@RequestBody StudentRequestDto req , @RequestAttribute("schoolId") Long schoolId
     )
     {
-        // Check if user with this PAN already exists
+        // Check if user with this PEN already exists
         var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
         
         User user;

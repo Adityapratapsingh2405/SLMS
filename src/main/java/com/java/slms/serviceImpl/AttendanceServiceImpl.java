@@ -89,26 +89,26 @@ public class AttendanceServiceImpl implements AttendanceService
 
             if (student == null)
             {
-                log.error("Student with PAN '{}' not found", panNumber);
-                throw new ResourceNotFoundException("Student with PAN '" + panNumber + "' not found");
+                log.error("Student with PEN '{}' not found", panNumber);
+                throw new ResourceNotFoundException("Student with PEN '" + panNumber + "' not found");
             }
 
             if (student.getStatus() == UserStatus.INACTIVE || student.getStatus() == UserStatus.GRADUATED)
             {
-                log.error("Student with PAN '{}' has status: {}", panNumber, student.getStatus());
-                throw new WrongArgumentException("Student with PAN '" + panNumber + "' has status '" + student.getStatus() + "' and cannot be marked for attendance");
+                log.error("Student with PEN '{}' has status: {}", panNumber, student.getStatus());
+                throw new WrongArgumentException("Student with PEN '" + panNumber + "' has status '" + student.getStatus() + "' and cannot be marked for attendance");
             }
 
             if (!student.getSession().getId().equals(activeSession.getId()))
             {
-                log.error("Student with PAN '{}' does not belong to the active session", panNumber);
-                throw new WrongArgumentException("Student with PAN '" + panNumber + "' does not belong to the active session");
+                log.error("Student with PEN '{}' does not belong to the active session", panNumber);
+                throw new WrongArgumentException("Student with PEN '" + panNumber + "' does not belong to the active session");
             }
 
             if (!student.getCurrentClass().getId().equals(classId))
             {
-                log.error("Student with PAN '{}' does not belong to class ID {}", panNumber, classId);
-                throw new WrongArgumentException("Student with PAN '" + panNumber + "' does not belong to class ID " + classId);
+                log.error("Student with PEN '{}' does not belong to class ID {}", panNumber, classId);
+                throw new WrongArgumentException("Student with PEN '" + panNumber + "' does not belong to class ID " + classId);
             }
 
             Optional<Attendance> existingAttendanceOpt = attendanceRepository.findByStudentAndDateBetweenAndSchoolId(student, dayStart, dayEnd, schoolId);
@@ -119,7 +119,7 @@ public class AttendanceServiceImpl implements AttendanceService
                 Attendance existingAttendance = existingAttendanceOpt.get();
                 existingAttendance.setPresent(sa.isPresent());
                 attendanceRepository.save(existingAttendance);
-                log.info("Updated attendance for student PAN '{}' to present={}", panNumber, sa.isPresent());
+                log.info("Updated attendance for student PEN '{}' to present={}", panNumber, sa.isPresent());
                 continue;
             }
 
@@ -132,7 +132,7 @@ public class AttendanceServiceImpl implements AttendanceService
             attendance.setClassEntity(classEntity);
 
             attendanceRepository.save(attendance);
-            log.info("Marked attendance for student PAN '{}' as present={}", panNumber, sa.isPresent());
+            log.info("Marked attendance for student PEN '{}' as present={}", panNumber, sa.isPresent());
         }
     }
 
@@ -163,7 +163,7 @@ public class AttendanceServiceImpl implements AttendanceService
 
             if (fetchedStudent.isEmpty())
             {
-                log.warn("Active Student with PAN '{}' not found. Skipping attendance update.", panNumber);
+                log.warn("Active Student with PEN '{}' not found. Skipping attendance update.", panNumber);
                 result.getInvalidPanNumbers().add(panNumber);
                 continue;
             }
@@ -177,7 +177,7 @@ public class AttendanceServiceImpl implements AttendanceService
 
             if (attendanceOpt.isEmpty())
             {
-                log.warn("Attendance record not found for student PAN '{}' on date {}. Skipping.", panNumber, attendanceDate);
+                log.warn("Attendance record not found for student PEN '{}' on date {}. Skipping.", panNumber, attendanceDate);
                 result.getInvalidPanNumbers().add(panNumber);
                 continue;
             }
@@ -186,7 +186,7 @@ public class AttendanceServiceImpl implements AttendanceService
 
             if (attendance.isPresent() == sa.isPresent())
             {
-                log.info("Attendance for student PAN '{}' on {} already marked as present={}, skipping update.",
+                log.info("Attendance for student PEN '{}' on {} already marked as present={}, skipping update.",
                         panNumber, attendanceDate, attendance.isPresent());
                 result.getUnchangedPanNumbers().add(panNumber);
                 continue;
@@ -197,7 +197,7 @@ public class AttendanceServiceImpl implements AttendanceService
             attendanceRepository.save(attendance);
 
             result.getUpdatedPanNumbers().add(panNumber);
-            log.info("Updated attendance for student PAN '{}' on {} to present={}.", panNumber, attendanceDate, sa.isPresent());
+            log.info("Updated attendance for student PEN '{}' on {} to present={}.", panNumber, attendanceDate, sa.isPresent());
         }
 
         return result;

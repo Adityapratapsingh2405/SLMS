@@ -305,10 +305,10 @@ public class ClassEntityServiceImpl implements ClassEntityService
                 }
             } catch (ResourceNotFoundException ex)
             {
-                log.warn("Fee catalog not found for student PAN: {}", studentDto.getPanNumber());
+                log.warn("Fee catalog not found for student PEN: {}", studentDto.getPanNumber());
             } catch (Exception ex)
             {
-                log.error("Error fetching fee catalog for student PAN: {}", studentDto.getPanNumber(), ex);
+                log.error("Error fetching fee catalog for student PEN: {}", studentDto.getPanNumber(), ex);
             }
         }
 

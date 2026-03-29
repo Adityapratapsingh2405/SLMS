@@ -27,8 +27,8 @@ public class EntityFetcher
         return studentRepository.findById(pan)
                 .orElseThrow(() ->
                 {
-                    log.error("Student with PAN number '{}' was not found.", pan);
-                    return new ResourceNotFoundException("Student with PAN number '" + pan + "' was not found.");
+                    log.error("Student with PEN number '{}' was not found.", pan);
+                    return new ResourceNotFoundException("Student with PEN number '" + pan + "' was not found.");
                 });
 
     }

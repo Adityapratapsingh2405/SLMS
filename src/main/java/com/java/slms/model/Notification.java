@@ -28,7 +28,7 @@ public class Notification
     private String message;
 
     @Column(name = "recipient_id", nullable = false)
-    private String recipientId; // PAN number for students, email for teachers/staff
+    private String recipientId; // PEN number for students, email for teachers/staff
 
     @Column(name = "recipient_type", nullable = false)
     @Enumerated(EnumType.STRING)

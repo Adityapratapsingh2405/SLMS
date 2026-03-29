@@ -44,7 +44,7 @@ public class StudentServiceImpl implements StudentService
     @Override
     public StudentResponseDto createStudent(StudentRequestDto studentRequestDto, Long schoolId)
     {
-        log.info("Attempting to create student with PAN: {}", studentRequestDto.getPanNumber());
+        log.info("Attempting to create student with PEN: {}", studentRequestDto.getPanNumber());
 
         School school = schoolRepository.findById(schoolId).orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
         
@@ -65,7 +65,7 @@ public class StudentServiceImpl implements StudentService
         
         if (existingStudent.isPresent())
         {
-            throw new AlreadyExistException("A student with PAN number '" + studentRequestDto.getPanNumber() + 
+            throw new AlreadyExistException("A student with PEN number '" + studentRequestDto.getPanNumber() + 
                     "' already exists in this school for the current session.");
         }
 
@@ -135,7 +135,7 @@ public class StudentServiceImpl implements StudentService
         studentEnrollments.setSession(session);
         studentEnrollmentRepository.save(studentEnrollments);
 
-        log.info("Student created successfully with PAN: {}", studentRequestDto.getPanNumber());
+        log.info("Student created successfully with PEN: {}", studentRequestDto.getPanNumber());
 
         StudentResponseDto responseDto = convertToDto(savedStudent);
         responseDto.setFeeCatalogStatus(FeeCatalogStatus.PENDING);
@@ -231,15 +231,15 @@ public class StudentServiceImpl implements StudentService
     }
 
     @Override
-    public StudentResponseDto getStudentByPAN(String pan, Long schoolId)
+    public StudentResponseDto getStudentByPEN(String pan, Long schoolId)
     {
-        log.info("Fetching student with PAN: {}", pan);
+        log.info("Fetching student with PEN: {}", pan);
         Student fetchedStudent = EntityFetcher.fetchStudentByPan(studentRepository, pan);
 
         StudentResponseDto dto = convertToDto(fetchedStudent);
         setFeeStatuses(dto, pan, schoolId);
 
-        log.info("Student fetched successfully with PAN: {}", pan);
+        log.info("Student fetched successfully with PEN: {}", pan);
         return dto;
     }
 
@@ -265,10 +265,10 @@ public class StudentServiceImpl implements StudentService
     @Override
     public StudentResponseDto updateStudent(String pan, UpdateStudentInfo updateStudentInfo, Long schoolId)
     {
-        log.info("Updating student with PAN: {}", pan);
+        log.info("Updating student with PEN: {}", pan);
 
         Student fetchedStudent = studentRepository.findByPanNumberIgnoreCaseAndSchool_IdAndStatusActive(pan, schoolId)
-                .orElseThrow(() -> new WrongArgumentException("Only active students can be changed. Student with PAN " + pan + " is currently INACTIVE or GRADUATE"));
+                .orElseThrow(() -> new WrongArgumentException("Only active students can be changed. Student with PEN " + pan + " is currently INACTIVE or GRADUATE"));
 
         if (!fetchedStudent.getSession().isActive())
         {
@@ -458,7 +458,7 @@ public class StudentServiceImpl implements StudentService
             }
         }
 
-        log.info("Student updated successfully with PAN: {}", pan);
+        log.info("Student updated successfully with PEN: {}", pan);
 
         StudentResponseDto dto = convertToDto(updatedStudent);
         setFeeStatuses(dto, pan, schoolId);
@@ -519,7 +519,7 @@ public class StudentServiceImpl implements StudentService
     {
         return studentRepository.findByPanNumberIgnoreCaseAndSchool_IdAndStatusActive(panNumber, schoolId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Student not found with PAN Number: " + panNumber +
+                        "Student not found with PEN Number: " + panNumber +
                                 " and ACTIVE status in school with ID: " + schoolId));
     }
 
@@ -528,7 +528,7 @@ public class StudentServiceImpl implements StudentService
     {
         return studentRepository.findByPanNumberIgnoreCaseAndSchool_IdAndStatusInactive(panNumber, schoolId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Student not found with PAN Number: " + panNumber +
+                        "Student not found with PEN Number: " + panNumber +
                                 " and ACTIVE status in school with ID: " + schoolId));
     }
 
@@ -561,7 +561,7 @@ public class StudentServiceImpl implements StudentService
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        log.info("Skipped PANs (inactive or not found): {}", skippedPans);
+        log.info("Skipped PENs (inactive or not found): {}", skippedPans);
 
         List<StudentEnrollments> enrollments = new ArrayList<>();
 
@@ -592,7 +592,7 @@ public class StudentServiceImpl implements StudentService
 
     private User fetchUserByPan(String panNumber)
     {
-        return userRepository.findByPanNumberIgnoreCase(panNumber).orElseThrow(() -> new ResourceNotFoundException("Student User not found with PAN: " + panNumber));
+        return userRepository.findByPanNumberIgnoreCase(panNumber).orElseThrow(() -> new ResourceNotFoundException("Student User not found with PEN: " + panNumber));
     }
 
     private ClassEntity fetchClassEntity(Long classId)
@@ -635,8 +635,8 @@ public class StudentServiceImpl implements StudentService
     {
         if (!student.getStatus().equals(UserStatus.ACTIVE))
         {
-            log.info("Update not allowed. Student with PAN {} has status: {}", student.getPanNumber(), student.getStatus());
-            throw new WrongArgumentException("Only active students can be changed. Student with PAN " + student.getPanNumber() + " is currently " + student.getStatus().name().toLowerCase() + ".");
+            log.info("Update not allowed. Student with PEN {} has status: {}", student.getPanNumber(), student.getStatus());
+            throw new WrongArgumentException("Only active students can be changed. Student with PEN " + student.getPanNumber() + " is currently " + student.getStatus().name().toLowerCase() + ".");
         }
     }
 
@@ -741,7 +741,7 @@ public class StudentServiceImpl implements StudentService
     @Override
     public List<PreviousSchoolingRecordDto> getPreviousSchoolingRecords(String panNumber, Long schoolId)
     {
-        log.info("Fetching previous schooling records for PAN: {}", panNumber);
+        log.info("Fetching previous schooling records for PEN: {}", panNumber);
         
         // Get all enrollments for this student (across all sessions)
         List<StudentEnrollments> enrollments = studentEnrollmentRepository
@@ -749,7 +749,7 @@ public class StudentServiceImpl implements StudentService
         
         if (enrollments.isEmpty())
         {
-            log.warn("No enrollment records found for PAN: {}", panNumber);
+            log.warn("No enrollment records found for PEN: {}", panNumber);
             return new ArrayList<>();
         }
         
@@ -767,7 +767,7 @@ public class StudentServiceImpl implements StudentService
             records.add(record);
         }
         
-        log.info("Found {} previous schooling records for PAN: {}", records.size(), panNumber);
+        log.info("Found {} previous schooling records for PEN: {}", records.size(), panNumber);
         return records;
     }
     
@@ -993,10 +993,10 @@ public class StudentServiceImpl implements StudentService
         
         // Find both students
         Student student1 = studentRepository.findByPanNumberIgnoreCaseAndSchool_IdAndStatusActive(panNumber1, schoolId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PAN: " + panNumber1));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: " + panNumber1));
         
         Student student2 = studentRepository.findByPanNumberIgnoreCaseAndSchool_IdAndStatusActive(panNumber2, schoolId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PAN: " + panNumber2));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: " + panNumber2));
         
         // Verify they are in the same class
         if (!student1.getCurrentClass().getId().equals(student2.getCurrentClass().getId())) {

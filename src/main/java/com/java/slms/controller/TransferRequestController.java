@@ -94,9 +94,9 @@ public class TransferRequestController
         );
     }
 
-    @Operation(summary = "Get transfer certificate requests by student PAN",
+    @Operation(summary = "Get transfer certificate requests by student PEN",
             parameters = {
-                    @Parameter(name = "studentPan", description = "PAN number of the student", required = true),
+                    @Parameter(name = "studentPan", description = "PEN number of the student", required = true),
                     @Parameter(name = "schoolId", description = "School ID from request attribute", required = true)
             },
             responses = {

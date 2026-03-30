@@ -75,7 +75,7 @@ public class ScoreServiceImpl implements ScoreService
             boolean isEnrolled = studentRepository.existsByClassNameAndPanNumberIgnoreCase(classEntity.getClassName(), panNumber);
             if (!isEnrolled)
             {
-                log.error("Student with PAN '{}' is not enrolled in class '{}'.", panNumber, classEntity.getClassName());
+                log.error("Student with PEN '{}' is not enrolled in class '{}'.", panNumber, classEntity.getClassName());
                 throw new ResourceNotFoundException("Student with PEN '" + panNumber + "' is not enrolled in class '" + classEntity.getClassName() + "'.");
             }
 
@@ -129,7 +129,7 @@ public class ScoreServiceImpl implements ScoreService
         if (scores.isEmpty())
         {
             log.error("No scores found for student with PEN: {}", panNumber);
-            throw new ResourceNotFoundException("No scores found for student with PAN: " + panNumber);
+            throw new ResourceNotFoundException("No scores found for student with PEN: " + panNumber);
         }
 
         return scores.stream().map(score ->

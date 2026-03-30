@@ -231,7 +231,7 @@ public class StudentServiceImpl implements StudentService
     }
 
     @Override
-    public StudentResponseDto getStudentByPEN(String pan, Long schoolId)
+    public StudentResponseDto getStudentByPAN(String pan, Long schoolId)
     {
         log.info("Fetching student with PEN: {}", pan);
         Student fetchedStudent = EntityFetcher.fetchStudentByPan(studentRepository, pan);

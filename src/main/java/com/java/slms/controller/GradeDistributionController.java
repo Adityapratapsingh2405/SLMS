@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/grade-distribution")
 @RequiredArgsConstructor
 @Tag(name = "Grade Distribution", description = "APIs for managing school grading systems")
-@CrossOrigin(origins = "*")
 public class GradeDistributionController
 {
     private final GradeDistributionService gradeDistributionService;

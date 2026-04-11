@@ -14,6 +14,9 @@ import com.java.slms.util.EntityFetcher;
 import com.java.slms.util.UserStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void changePassword(Long userId, PasswordDto password)
+    public void changePassword(Long userId, String password)
     {
         log.info("Changing password for user with ID: {}", userId);
         User user = EntityFetcher.fetchUserByUserId(userRepository, userId);
@@ -42,7 +45,7 @@ public class UserServiceImpl implements UserService
             throw new WrongArgumentException("Cannot change password: user account is disabled");
         }
 
-        user.setPassword(passwordEncoder.encode(password.getPassword()));
+        user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
         log.info("Password changed successfully for user ID: {}", userId);
     }
@@ -163,4 +166,20 @@ public class UserServiceImpl implements UserService
             }
         }
     }
+
+	@Override
+	public User getByPan(String panNumber) {
+		Optional<User> op =  userRepository.findByPanNumberIgnoreCase(panNumber);
+		if(op.isPresent())
+			return op.get();
+		return null;
+	}
+
+	@Override
+	public User getByEmail(String email) {
+		Optional<User> op =  userRepository.findByEmailIgnoreCase(email);
+		if(op.isPresent())
+			return op.get();
+		return null;
+	}
 }

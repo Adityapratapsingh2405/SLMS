@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,7 @@ public class UserController
 {
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(
             summary = "Change user's password",
@@ -39,24 +41,41 @@ public class UserController
             }
     )
     @PutMapping("/change-password")
-    public ResponseEntity<RestResponse<Void>> changePassword(@RequestBody PasswordDto password
+    public ResponseEntity<RestResponse<Void>> changePassword(@RequestBody PasswordDto req
     )
     {
-    	UserDetails det = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	if(det!=null)
+    	User user = null;
+    	String type = req.getUserType();
+    	
+    	if(type.equals("student"))
+    	   user = userService.getByPan(req.getPanNumber());
+    	else
+    		user = userService.getByEmail(req.getEmail());
+    	
+    	
+    	if(user!=null)
     	{
-    		User user = (User) det;
-    		userService.changePassword(user.getId(), password);
+    		if(passwordEncoder.matches(req.getOldpassword(), user.getPassword()))
+    		{
+    		userService.changePassword(user.getId(), req.getPassword());
     		 return ResponseEntity.ok(
     	                RestResponse.<Void>builder()
     	                        .message("Password updated successfully")
     	                        .status(HttpStatus.OK.value())
     	                        .build()
     	        );
+    		}else {
+    			 return ResponseEntity.ok(
+     	                RestResponse.<Void>builder()
+     	                        .message("Old Password Not Match !")
+     	                        .status(HttpStatus.BAD_REQUEST.value())
+     	                        .build()
+     	        );
+    		}
     	}else {
     		 return ResponseEntity.ok(
     	                RestResponse.<Void>builder()
-    	                        .message("Password updated Failed")
+    	                        .message("User Not Found !")
     	                        .status(HttpStatus.BAD_REQUEST.value())
     	                        .build()
     	        );

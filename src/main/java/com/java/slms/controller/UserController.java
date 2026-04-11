@@ -39,7 +39,7 @@ public class UserController
                     @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content)
             }
     )
-    @PatchMapping("/change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<RestResponse<Void>> changePassword(@RequestBody PasswordDto password
     )
     {

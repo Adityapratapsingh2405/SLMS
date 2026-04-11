@@ -32,8 +32,7 @@ public class UserController
 
     @Operation(
             summary = "Change user's password",
-            description = "Change password for the user identified by userId.",
-            parameters = {@Parameter(name = "userId", description = "ID of the user", required = true)},
+            description = "Change password for the user",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Password updated successfully"),
                     @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content)

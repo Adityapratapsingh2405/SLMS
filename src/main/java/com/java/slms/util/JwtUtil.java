@@ -23,8 +23,8 @@ public class JwtUtil
     private final String JWT_SECRET = "jwt.secret";
     private final long jwtExpirationInMs = 1000L * 60 * 60; // 1 hour
 
-    private final Key key = Keys.hmacShaKeyFor(ConfigUtil.getRequired(JWT_SECRET).getBytes());
-
+    //private final Key key = Keys.hmacShaKeyFor(ConfigUtil.getRequired(JWT_SECRET).getBytes());
+    private final Key key = Keys.hmacShaKeyFor("0f320699-8c06-46df-ae9e-e7f392fb0905".getBytes());
     public String generateToken(UserDetails userDetails)
     {
         Date now = new Date();

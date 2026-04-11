@@ -17,11 +17,17 @@ public class DbConnectionConfig
     public DataSource dataSource(DataSourceProperties properties)
     {
 
-        String host = ConfigUtil.getRequired("db.host");
-        String port = ConfigUtil.getRequired("db.port");
-        String dbName = ConfigUtil.getRequired("db.name");
-        String username = ConfigUtil.getRequired("db.username");
-        String password = ConfigUtil.getRequired("db.password");
+//        String host = ConfigUtil.getRequired("db.host");
+//        String port = ConfigUtil.getRequired("db.port");
+//        String dbName = ConfigUtil.getRequired("db.name");
+//        String username = ConfigUtil.getRequired("db.username");
+//        String password = ConfigUtil.getRequired("db.password");
+    	
+    	  String host = "localhost";
+          String port = "3306";
+          String dbName = "slms";
+          String username = "root";
+          String password = "root";
 
         String url = JDBC_PREFIX + host + ":" + port + "/" + dbName;
 

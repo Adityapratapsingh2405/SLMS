@@ -21,7 +21,7 @@ public class WebConfig  implements WebMvcConfigurer
 	public void addCorsMappings(CorsRegistry registry) {
 	    registry.addMapping("/**")
 	            .allowedOriginPatterns("http://3.110.94.0","http://classconnect.it.com")
-	            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	            .allowedMethods("GET", "POST", "PUT","PATCH" ,"DELETE", "OPTIONS")
 	            .allowedHeaders("*")
 	            .exposedHeaders("Authorization")
 	            .allowCredentials(true)

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -213,7 +214,8 @@ public class AuthController
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/register/student")
     @Transactional
-    public ResponseEntity<RestResponse<StudentResponseDto>> registerStudent(@RequestBody StudentRequestDto req , @RequestAttribute("schoolId") Long schoolId
+    public ResponseEntity<RestResponse<StudentResponseDto>> registerStudent(@RequestBody StudentRequestDto req ,
+    		@RequestAttribute("schoolId") Long schoolId
     )
     {
         // Check if user with this PEN already exists
@@ -248,6 +250,42 @@ public class AuthController
         );
     }
 
+    
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/register/bulkstudent")
+    @Transactional
+    public ResponseEntity registerBulkStudent(@RequestBody StudentBulkRequestDto req ,
+    		@RequestAttribute("schoolId") Long schoolId
+    )
+    {
+        // Check if user with this PEN already exists
+        var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
+        
+        User user;
+        if (existingUserOpt.isPresent())
+        {
+            // User exists - reuse the existing user account for new session/school
+            user = existingUserOpt.get();
+            req.setUserId(user.getId());
+        }
+        else
+        {
+            // Create new user account
+            user = User.builder()
+                    .panNumber(req.getPanNumber())
+                    .password(passwordEncoder.encode("123456"))
+                    .roles(Set.of(RoleEnum.ROLE_STUDENT))
+                    .enabled(true)
+                    .build();
+            userRepository.save(user);
+            req.setUserId(user.getId());
+        }
+
+        String res = studentService.createBulkStudent(req, schoolId);
+      	return ResponseEntity.ok(res);
+    }
+    
+    
 
     @PostMapping("/upload-students")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

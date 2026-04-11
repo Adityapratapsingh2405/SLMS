@@ -3,12 +3,15 @@ package com.java.slms.controller;
 import com.java.slms.dto.PasswordDto;
 import com.java.slms.dto.UpdateUserDetails;
 import com.java.slms.dto.UserRequest;
+import com.java.slms.model.User;
 import com.java.slms.payload.RestResponse;
 import com.java.slms.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,19 +39,29 @@ public class UserController
                     @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content)
             }
     )
-    @PutMapping("/{userId}/change-password")
-    public ResponseEntity<RestResponse<Void>> changePassword(
-            @PathVariable Long userId,
-            @RequestBody PasswordDto password
+    @PatchMapping("/change-password")
+    public ResponseEntity<RestResponse<Void>> changePassword(@RequestBody PasswordDto password
     )
     {
-        userService.changePassword(userId, password);
-        return ResponseEntity.ok(
-                RestResponse.<Void>builder()
-                        .message("Password updated successfully")
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
+    	UserDetails det = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	if(det!=null)
+    	{
+    		User user = (User) det;
+    		userService.changePassword(user.getId(), password);
+    		 return ResponseEntity.ok(
+    	                RestResponse.<Void>builder()
+    	                        .message("Password updated successfully")
+    	                        .status(HttpStatus.OK.value())
+    	                        .build()
+    	        );
+    	}else {
+    		 return ResponseEntity.ok(
+    	                RestResponse.<Void>builder()
+    	                        .message("Password updated Failed")
+    	                        .status(HttpStatus.BAD_REQUEST.value())
+    	                        .build()
+    	        );
+    	}      
     }
 
     @Operation(

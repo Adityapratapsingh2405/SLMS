@@ -2,6 +2,7 @@ package com.java.slms.service;
 
 import com.java.slms.dto.CurrentDayAttendance;
 import com.java.slms.dto.PreviousSchoolingRecordDto;
+import com.java.slms.dto.StudentBulkRequestDto;
 import com.java.slms.dto.StudentRequestDto;
 import com.java.slms.dto.StudentResponseDto;
 import com.java.slms.dto.UpdateStudentInfo;
@@ -54,4 +55,6 @@ public interface StudentService
 
     @Transactional
     void swapRollNumbers(String panNumber1, String panNumber2, Long schoolId);
+
+	String createBulkStudent(StudentBulkRequestDto req, Long schoolId);
 }

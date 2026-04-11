@@ -60,7 +60,7 @@ public class UserController
     		userService.changePassword(user.getId(), req.getPassword());
     		 return ResponseEntity.ok(
     	                RestResponse.<Void>builder()
-    	                        .message("Password updated successfully")
+    	                        .message("success")
     	                        .status(HttpStatus.OK.value())
     	                        .build()
     	        );

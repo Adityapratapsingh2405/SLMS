@@ -60,6 +60,7 @@ public class ClassEntityServiceImpl implements ClassEntityService
 
         if (existingClass.isPresent())
         {
+        	System.out.println(existingClass.get());
             log.warn("Class already exists with name '{}' for session ID {}", className, session.getId());
             throw new AlreadyExistException("Class already exists with this name for the selected active session.");
         }

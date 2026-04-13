@@ -18,7 +18,7 @@ import java.util.Set;
 @Table(
         name = "class_entity"
 )
-
+@ToString
 public class ClassEntity extends BaseEntity
 {
     @Id

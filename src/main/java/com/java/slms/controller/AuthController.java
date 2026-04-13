@@ -258,6 +258,7 @@ public class AuthController
     		@RequestAttribute("schoolId") Long schoolId
     )
     {
+    	System.out.println(req);
         // Check if user with this PEN already exists
         var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
         
@@ -280,7 +281,7 @@ public class AuthController
             userRepository.save(user);
             req.setUserId(user.getId());
         }
-
+        System.out.println("User : " + user);
         String res = studentService.createBulkStudent(req, schoolId);
         return ResponseEntity.ok(RestResponse.builder()
                 .data(res)
@@ -289,6 +290,46 @@ public class AuthController
                 .build());
     }
     
+    
+    @PostMapping("/register/bulkteacher")
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity registerBulkTeacher(@RequestBody TeacherBulkRequestDto req,
+                                                            @RequestAttribute("schoolId") Long schoolId
+    )
+    {
+        // Check if user already exists
+        if (userRepository.findByEmailIgnoreCase(req.getEmail()).isPresent())
+        {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(RestResponse.<Void>builder()
+                            .message("Email already registered")
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .build());
+        }
+
+       // Create and save user
+        User user = User.builder()
+                .email(req.getEmail())
+                .password(passwordEncoder.encode("123456"))
+                .roles(Set.of(RoleEnum.ROLE_TEACHER))
+                .enabled(true)
+                .build();
+        user = userRepository.save(user);
+
+       req.setUserId(user.getId());
+       String res = teacherService.createBulkTeacher(req, schoolId);
+
+        return ResponseEntity.ok(
+                RestResponse.builder()
+                		.data(res)
+                        .message("Teacher registered successfully")
+                        .status(HttpStatus.OK.value())
+                        .build()
+        );
+    }
+
     
 
     @PostMapping("/upload-students")

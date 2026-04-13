@@ -1,5 +1,6 @@
 package com.java.slms.serviceImpl;
 
+import com.java.slms.dto.TeacherBulkRequestDto;
 import com.java.slms.dto.TeacherDto;
 import com.java.slms.exception.AlreadyExistException;
 import com.java.slms.exception.ResourceNotFoundException;
@@ -15,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -292,5 +294,54 @@ public class TeacherServiceImpl implements TeacherService
 
         return dto;
     }
+
+	@Override
+	public String createBulkTeacher(TeacherBulkRequestDto req, Long schoolId) 
+	{
+		try {
+			log.info("Creating teacher with email: {}", req.getEmail());
+
+	        if (teacherRepository.findByEmailIgnoreCaseAndSchoolId(req.getEmail(), schoolId).isPresent())
+	        {
+	            throw new AlreadyExistException("A teacher already exists");
+	        }
+
+	        School school = schoolRepository.findById(schoolId).orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
+
+	        Teacher teacher = new Teacher();
+	        teacher.setContactNumber(req.getMobile());
+	        teacher.setEmail(req.getEmail());
+	        teacher.setName(req.getName());
+	        teacher.setCreatedAt(new Date());
+	        teacher.setJoiningDate(LocalDate.now());
+	        teacher.setStatus(UserStatus.ACTIVE);
+	        teacher.setSchool(school);
+	        Teacher savedTeacher = teacherRepository.save(teacher);
+
+	        // Create leave allowance for the teacher in the active session
+	        Session activeSession = sessionRepository.findBySchoolIdAndActiveTrue(schoolId)
+	                .orElseThrow(() -> new ResourceNotFoundException("No active session found for school ID: " + schoolId));
+
+	        Staff staff = new Staff();
+	        staff.setStaffType(RoleEnum.ROLE_TEACHER);
+	        staff.setSchool(school);
+	        staff.setEmail(teacher.getEmail());
+	        Staff savedStaff = staffRepository.save(staff);
+
+	        // Create staff leave allowance
+	        StaffLeaveAllowance staffLeaveAllowance = new StaffLeaveAllowance();
+	        staffLeaveAllowance.setSession(activeSession);
+	        staffLeaveAllowance.setStaff(savedStaff);
+	        staffLeaveAllowance.setSchool(school);
+	        Integer allowedLeaves = 10;
+	        staffLeaveAllowance.setAllowedLeaves(allowedLeaves != null ? allowedLeaves : 10);
+	        staffLeaveAllowanceRepository.save(staffLeaveAllowance);
+
+	        log.info("Teacher created with ID: {}", savedTeacher.getId());
+	        return "success";
+		}catch(Exception ex) {
+			return ex.getMessage();
+		}
+	}
 
 }

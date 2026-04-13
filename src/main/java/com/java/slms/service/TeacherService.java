@@ -1,5 +1,6 @@
 package com.java.slms.service;
 
+import com.java.slms.dto.TeacherBulkRequestDto;
 import com.java.slms.dto.TeacherDto;
 import com.java.slms.model.Teacher;
 
@@ -34,5 +35,7 @@ public interface TeacherService
 
     // Update teacher information
     TeacherDto updateTeacher(Long id, TeacherDto teacherDto, Long schoolId);
+
+	String createBulkTeacher(TeacherBulkRequestDto req, Long schoolId);
 
 }

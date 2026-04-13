@@ -18,15 +18,10 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class StudentBulkRequestDto
+public class TeacherBulkRequestDto
 {
-
-    private String panNumber;
-    private String name;
-    private String gender;
-    private String className;
-    private String sessionName;
-    private String fatherName;
+    private String name;  
+    private String email;
     private String mobile;
     private Long userId;
    

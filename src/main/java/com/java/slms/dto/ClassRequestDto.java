@@ -6,10 +6,12 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ClassRequestDto
 {
     private String className;
     private Double feesAmount;
     private Long schoolId;
     private Long classTeacherId;
+    private Long sessionId;
 }

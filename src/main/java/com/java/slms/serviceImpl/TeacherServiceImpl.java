@@ -303,7 +303,7 @@ public class TeacherServiceImpl implements TeacherService
 
 	        if (teacherRepository.findByEmailIgnoreCaseAndSchoolId(req.getEmail(), schoolId).isPresent())
 	        {
-	            throw new AlreadyExistException("A teacher already exists");
+	            return "A teacher already exists";
 	        }
 
 	        School school = schoolRepository.findById(schoolId).orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));

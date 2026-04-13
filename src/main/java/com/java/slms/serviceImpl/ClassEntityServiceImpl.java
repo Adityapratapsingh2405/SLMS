@@ -44,8 +44,11 @@ public class ClassEntityServiceImpl implements ClassEntityService
     {
         School school = schoolRepository.findById(schoolId).orElseThrow(() -> new ResourceNotFoundException("School not found with Id : " + schoolId));
 
-        Session session = sessionRepository.findBySchoolIdAndActiveTrue(schoolId).orElseThrow(() -> new WrongArgumentException("Session not found or does not belong to the provided school, or is not active."));
-
+        //Session session = sessionRepository.findBySchoolIdAndActiveTrue(schoolId).orElseThrow(() -> new WrongArgumentException("Session not found or does not belong to the provided school, or is not active."));
+        Session session = sessionRepository.findById(classRequestDto.getSessionId()).orElseThrow(() -> new WrongArgumentException("Session not found."));
+        if(!session.isActive())
+        	throw new AlreadyExistException("Session Not Active.");
+        
         // Parse class name to handle various formats like "L.K.G.-A", "LKG-A", "11-1A"
         ClassNameParser.ParsedClassName parsed = ClassNameParser.parse(classRequestDto.getClassName().trim());
         String className = parsed.getFullName(); // Store as standardized format: "L.K.G.-A", "LKG-A", etc.

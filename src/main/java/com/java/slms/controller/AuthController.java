@@ -282,7 +282,11 @@ public class AuthController
         }
 
         String res = studentService.createBulkStudent(req, schoolId);
-      	return ResponseEntity.ok(res);
+        return ResponseEntity.ok(RestResponse.builder()
+                .data(res)
+                .message("Students Saved successfully")
+                .status(HttpStatus.OK.value())
+                .build());
     }
     
     

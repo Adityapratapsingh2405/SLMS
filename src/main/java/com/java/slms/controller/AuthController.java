@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,394 +34,288 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth Controller", description = "Handles user authentication and registration")
-public class AuthController
-{
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtUtil jwtUtil;
+public class AuthController {
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final AuthenticationManager authenticationManager;
+	private final CustomUserDetailsService userDetailsService;
+	private final JwtUtil jwtUtil;
 
-    private final AdminService adminService;
-    private final SchoolService schoolService;
-    private final TeacherService teacherService;
-    private final StudentService studentService;
-    private final NonTeachingStaffService nonTeachingStaffService;
-    private final ModelMapper modelMapper;
-    private final ExcelStudentParseService excelStudentParseService;
+	private final AdminService adminService;
+	private final SchoolService schoolService;
+	private final TeacherService teacherService;
+	private final StudentService studentService;
+	private final NonTeachingStaffService nonTeachingStaffService;
+	private final ModelMapper modelMapper;
+	private final ExcelStudentParseService excelStudentParseService;
 
-    @PostMapping("/register/admin")
-    @Transactional
-    public ResponseEntity<RestResponse<UserRequest>> registerAdmin(@RequestBody AdminRegisterRequestDto req)
-    {
-        // Check if email is already registered
-        if (userRepository.findByPanNumberIgnoreCase(req.getEmail()).isPresent())
-        {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(RestResponse.<UserRequest>builder()
-                            .message("Email already registered")
-                            .status(HttpStatus.BAD_REQUEST.value())
-                            .build());
-        }
+	@PostMapping("/register/admin")
+	@Transactional
+	public ResponseEntity<RestResponse<UserRequest>> registerAdmin(@RequestBody AdminRegisterRequestDto req) {
+		// Check if email is already registered
+		if (userRepository.findByPanNumberIgnoreCase(req.getEmail()).isPresent()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RestResponse.<UserRequest>builder()
+					.message("Email already registered").status(HttpStatus.BAD_REQUEST.value()).build());
+		}
 
-        // Create User object with the provided data
-        User user = User.builder()
-                .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))  // Encoded password
-                .roles(Set.of(RoleEnum.ROLE_ADMIN))  // Assign role as admin
-                .enabled(true)  // Enable the user
-                .build();
+		// Create User object with the provided data
+		User user = User.builder().email(req.getEmail()).password(passwordEncoder.encode(req.getPassword())) // Encoded
+																												// password
+				.roles(Set.of(RoleEnum.ROLE_ADMIN)) // Assign role as admin
+				.enabled(true) // Enable the user
+				.build();
 
-        // Save the user to generate an ID
-        userRepository.save(user);
+		// Save the user to generate an ID
+		userRepository.save(user);
 
-        // Map AdminRegisterRequestDto to UserRequest manually to avoid conflicts
-        UserRequest userRequest = new UserRequest();
-        userRequest.setEmail(req.getEmail());
-        userRequest.setContactNumber(req.getContactNumber());
-        userRequest.setDesignation(req.getDesignation());
-        userRequest.setQualification(req.getQualification());
-        userRequest.setName(req.getName());
+		// Map AdminRegisterRequestDto to UserRequest manually to avoid conflicts
+		UserRequest userRequest = new UserRequest();
+		userRequest.setEmail(req.getEmail());
+		userRequest.setContactNumber(req.getContactNumber());
+		userRequest.setDesignation(req.getDesignation());
+		userRequest.setQualification(req.getQualification());
+		userRequest.setName(req.getName());
 
-        // Set the userId to link the user to the admin
-        userRequest.setUserId(user.getId());
+		// Set the userId to link the user to the admin
+		userRequest.setUserId(user.getId());
 
-        // Map the school data and create a school
-        SchoolRequestDto schoolRequestDto = new SchoolRequestDto();
-        schoolRequestDto.setSchoolName(req.getSchoolName());
-        schoolRequestDto.setSchoolEmail(req.getSchoolEmail());
-        schoolRequestDto.setSchoolWebsite(req.getSchoolWebsite());
-        schoolRequestDto.setSchoolContactNumber(req.getSchoolContactNumber());
-        schoolRequestDto.setSchoolAddress(req.getSchoolAddress());  // Assuming there is a schoolAddress in the request
-        schoolRequestDto.setSchoolLogo(req.getSchoolLogo());  // Set school logo from request
-        schoolRequestDto.setSchoolTagline(req.getSchoolTagline());  // Set school tagline from request
+		// Map the school data and create a school
+		SchoolRequestDto schoolRequestDto = new SchoolRequestDto();
+		schoolRequestDto.setSchoolName(req.getSchoolName());
+		schoolRequestDto.setSchoolEmail(req.getSchoolEmail());
+		schoolRequestDto.setSchoolWebsite(req.getSchoolWebsite());
+		schoolRequestDto.setSchoolContactNumber(req.getSchoolContactNumber());
+		schoolRequestDto.setSchoolAddress(req.getSchoolAddress()); // Assuming there is a schoolAddress in the request
+		schoolRequestDto.setSchoolLogo(req.getSchoolLogo()); // Set school logo from request
+		schoolRequestDto.setSchoolTagline(req.getSchoolTagline()); // Set school tagline from request
 
-        // Create school using school service
-        SchoolResponseDto schoolResponseDto = schoolService.createSchool(schoolRequestDto);
+		// Create school using school service
+		SchoolResponseDto schoolResponseDto = schoolService.createSchool(schoolRequestDto);
 
-        // Set the schoolId in UserRequest
-        userRequest.setSchoolId(schoolResponseDto.getId());
+		// Set the schoolId in UserRequest
+		userRequest.setSchoolId(schoolResponseDto.getId());
 
-        // Now, create the admin using adminService
-        return ResponseEntity.ok(
-                RestResponse.<UserRequest>builder()
-                        .data(adminService.createAdmin(userRequest))  // Save the admin and return response
-                        .message("Admin With School Details registered successfully")
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
-    }
+		// Now, create the admin using adminService
+		return ResponseEntity.ok(RestResponse.<UserRequest>builder().data(adminService.createAdmin(userRequest)) // Save
+																													// the
+																													// admin
+																													// and
+																													// return
+																													// response
+				.message("Admin With School Details registered successfully").status(HttpStatus.OK.value()).build());
+	}
 
-    @PostMapping("/register/staff")
-    @Transactional
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<RestResponse<Void>> registerStaff(@RequestBody StaffRegisterRequest req,
-                                                            @RequestAttribute("schoolId") Long schoolId
-    )
-    {
-        // Check if user already exists
-        if (userRepository.findByEmailIgnoreCase(req.getEmail()).isPresent())
-        {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(RestResponse.<Void>builder()
-                            .message("Email already registered")
-                            .status(HttpStatus.BAD_REQUEST.value())
-                            .build());
-        }
+	@PostMapping("/register/staff")
+	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<RestResponse<Void>> registerStaff(@RequestBody StaffRegisterRequest req,
+			@RequestAttribute("schoolId") Long schoolId) {
+		// Check if user already exists
+		if (userRepository.findByEmailIgnoreCase(req.getEmail()).isPresent()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RestResponse.<Void>builder()
+					.message("Email already registered").status(HttpStatus.BAD_REQUEST.value()).build());
+		}
 
-        // Validate and convert roles
-        Set<RoleEnum> roleEnums = new HashSet<>();
-        List<String> invalidRoles = new ArrayList<>();
-        for (String roleStr : req.getRoles())
-        {
-            try
-            {
-                roleEnums.add(RoleEnum.valueOf(roleStr));
-            } catch (IllegalArgumentException e)
-            {
-                invalidRoles.add(roleStr);
-            }
-        }
+		// Validate and convert roles
+		Set<RoleEnum> roleEnums = new HashSet<>();
+		List<String> invalidRoles = new ArrayList<>();
+		for (String roleStr : req.getRoles()) {
+			try {
+				roleEnums.add(RoleEnum.valueOf(roleStr));
+			} catch (IllegalArgumentException e) {
+				invalidRoles.add(roleStr);
+			}
+		}
 
-        if (!invalidRoles.isEmpty())
-        {
-            return ResponseEntity.badRequest().body(RestResponse.<Void>builder()
-                    .message("Invalid roles: " + String.join(", ", invalidRoles))
-                    .status(HttpStatus.BAD_REQUEST.value())
-                    .build());
-        }
+		if (!invalidRoles.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.body(RestResponse.<Void>builder().message("Invalid roles: " + String.join(", ", invalidRoles))
+							.status(HttpStatus.BAD_REQUEST.value()).build());
+		}
 
-        if (roleEnums.contains(RoleEnum.ROLE_TEACHER) && roleEnums.contains(RoleEnum.ROLE_NON_TEACHING_STAFF))
-        {
-            return ResponseEntity.badRequest().body(RestResponse.<Void>builder()
-                    .message("A person cannot have both ROLE_TEACHER and NON_TEACHING_STAFF")
-                    .status(HttpStatus.BAD_REQUEST.value())
-                    .build());
-        }
+		if (roleEnums.contains(RoleEnum.ROLE_TEACHER) && roleEnums.contains(RoleEnum.ROLE_NON_TEACHING_STAFF)) {
+			return ResponseEntity.badRequest()
+					.body(RestResponse.<Void>builder()
+							.message("A person cannot have both ROLE_TEACHER and NON_TEACHING_STAFF")
+							.status(HttpStatus.BAD_REQUEST.value()).build());
+		}
 
-        // Create and save user
-        User user = User.builder()
-                .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .roles(roleEnums)
-                .enabled(true)
-                .build();
-        user = userRepository.save(user);
+		// Create and save user
+		User user = User.builder().email(req.getEmail()).password(passwordEncoder.encode(req.getPassword()))
+				.roles(roleEnums).enabled(true).build();
+		user = userRepository.save(user);
 
-        // Process each role
-        for (RoleEnum role : roleEnums)
-        {
-            switch (role)
-            {
-                case ROLE_TEACHER ->
-                {
-                    TeacherDto teacherDto = modelMapper.map(req, TeacherDto.class);
-                    teacherDto.setUserId(user.getId());
-                    teacherService.createTeacher(teacherDto, schoolId);
-                }
+		// Process each role
+		for (RoleEnum role : roleEnums) {
+			switch (role) {
+			case ROLE_TEACHER -> {
+				TeacherDto teacherDto = modelMapper.map(req, TeacherDto.class);
+				teacherDto.setUserId(user.getId());
+				teacherService.createTeacher(teacherDto, schoolId);
+			}
 //                case ROLE_ADMIN ->
 //                {
 //                    UserRequest adminReq = modelMapper.map(req, UserRequest.class);
 //                    adminReq.setUserId(user.getId());
 //                    adminService.createAdmin(adminReq);
 //                }
-                case ROLE_NON_TEACHING_STAFF ->
-                {
-                    UserRequest feeStaffReq = modelMapper.map(req, UserRequest.class);
-                    feeStaffReq.setUserId(user.getId());
-                    nonTeachingStaffService.createFeeStaff(feeStaffReq, schoolId);
-                }
-                default ->
-                {
-                    return ResponseEntity.badRequest().body(RestResponse.<Void>builder()
-                            .message("Unsupported role: " + role.name())
-                            .status(HttpStatus.BAD_REQUEST.value())
-                            .build());
-                }
-            }
-        }
+			case ROLE_NON_TEACHING_STAFF -> {
+				UserRequest feeStaffReq = modelMapper.map(req, UserRequest.class);
+				feeStaffReq.setUserId(user.getId());
+				nonTeachingStaffService.createFeeStaff(feeStaffReq, schoolId);
+			}
+			default -> {
+				return ResponseEntity.badRequest().body(RestResponse.<Void>builder()
+						.message("Unsupported role: " + role.name()).status(HttpStatus.BAD_REQUEST.value()).build());
+			}
+			}
+		}
 
-        return ResponseEntity.ok(
-                RestResponse.<Void>builder()
-                        .message("Staff registered successfully with roles: " +
-                                roleEnums.stream().map(Enum::name).collect(Collectors.joining(", ")))
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
-    }
+		return ResponseEntity.ok(RestResponse.<Void>builder()
+				.message("Staff registered successfully with roles: "
+						+ roleEnums.stream().map(Enum::name).collect(Collectors.joining(", ")))
+				.status(HttpStatus.OK.value()).build());
+	}
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/register/student")
-    @Transactional
-    public ResponseEntity<RestResponse<StudentResponseDto>> registerStudent(@RequestBody StudentRequestDto req ,
-    		@RequestAttribute("schoolId") Long schoolId
-    )
-    {
-        // Check if user with this PEN already exists
-        var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
-        
-        User user;
-        if (existingUserOpt.isPresent())
-        {
-            // User exists - reuse the existing user account for new session/school
-            user = existingUserOpt.get();
-            req.setUserId(user.getId());
-        }
-        else
-        {
-            // Create new user account
-            user = User.builder()
-                    .panNumber(req.getPanNumber())
-                    .password(passwordEncoder.encode(req.getPassword()))
-                    .roles(Set.of(RoleEnum.ROLE_STUDENT))
-                    .enabled(true)
-                    .build();
-            userRepository.save(user);
-            req.setUserId(user.getId());
-        }
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PostMapping("/register/student")
+	@Transactional
+	public ResponseEntity<RestResponse<StudentResponseDto>> registerStudent(@RequestBody StudentRequestDto req,
+			@RequestAttribute("schoolId") Long schoolId) {
+		// Check if user with this PEN already exists
+		var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
 
-        return ResponseEntity.ok(
-                RestResponse.<StudentResponseDto>builder()
-                        .data(studentService.createStudent(req, schoolId))
-                        .message("Student registered successfully")
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
-    }
+		User user;
+		if (existingUserOpt.isPresent()) {
+			// User exists - reuse the existing user account for new session/school
+			user = existingUserOpt.get();
+			req.setUserId(user.getId());
+		} else {
+			// Create new user account
+			user = User.builder().panNumber(req.getPanNumber()).password(passwordEncoder.encode(req.getPassword()))
+					.roles(Set.of(RoleEnum.ROLE_STUDENT)).enabled(true).build();
+			userRepository.save(user);
+			req.setUserId(user.getId());
+		}
 
-    
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/register/bulkstudent")
-    @Transactional
-    public ResponseEntity registerBulkStudent(@RequestBody StudentBulkRequestDto req ,
-    		@RequestAttribute("schoolId") Long schoolId
-    )
-    {
-    	System.out.println(req);
-        // Check if user with this PEN already exists
-        var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
-        
-        User user;
-        if (existingUserOpt.isPresent())
-        {
-            // User exists - reuse the existing user account for new session/school
-            user = existingUserOpt.get();
-            req.setUserId(user.getId());
-        }
-        else
-        {
-            // Create new user account
-            user = User.builder()
-                    .panNumber(req.getPanNumber())
-                    .password(passwordEncoder.encode("123456"))
-                    .roles(Set.of(RoleEnum.ROLE_STUDENT))
-                    .enabled(true)
-                    .build();
-            userRepository.save(user);
-            req.setUserId(user.getId());
-        }
-        System.out.println("User : " + user);
-        String res = studentService.createBulkStudent(req, schoolId);
-        return ResponseEntity.ok(RestResponse.builder()
-                .data(res)
-                .message("Students Saved successfully")
-                .status(HttpStatus.OK.value())
-                .build());
-    }
-    
-    
-    @PostMapping("/register/bulkteacher")
-    @Transactional
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity registerBulkTeacher(@RequestBody TeacherBulkRequestDto req,
-                                                            @RequestAttribute("schoolId") Long schoolId
-    )
-    {
-        // Check if user already exists
-        if (userRepository.findByEmailIgnoreCase(req.getEmail()).isPresent())
-        {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(RestResponse.<Void>builder()
-                            .message("Email already registered")
-                            .status(HttpStatus.BAD_REQUEST.value())
-                            .build());
-        }
+		return ResponseEntity
+				.ok(RestResponse.<StudentResponseDto>builder().data(studentService.createStudent(req, schoolId))
+						.message("Student registered successfully").status(HttpStatus.OK.value()).build());
+	}
 
-       // Create and save user
-        User user = User.builder()
-                .email(req.getEmail())
-                .password(passwordEncoder.encode("123456"))
-                .roles(Set.of(RoleEnum.ROLE_TEACHER))
-                .enabled(true)
-                .build();
-        user = userRepository.save(user);
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PostMapping("/register/bulkstudent")
+	@Transactional
+	public ResponseEntity registerBulkStudent(@RequestBody StudentBulkRequestDto req,
+			@RequestAttribute("schoolId") Long schoolId) {
+		System.out.println(req);
+		// Check if user with this PEN already exists
+		var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
 
-       req.setUserId(user.getId());
-       String res = teacherService.createBulkTeacher(req, schoolId);
+		User user;
+		if (existingUserOpt.isPresent()) {
+			// User exists - reuse the existing user account for new session/school
+			user = existingUserOpt.get();
+			req.setUserId(user.getId());
+		} else {
+			// Create new user account
+			user = User.builder().panNumber(req.getPanNumber()).password(passwordEncoder.encode("123456"))
+					.roles(Set.of(RoleEnum.ROLE_STUDENT)).enabled(true).build();
+			userRepository.save(user);
+			req.setUserId(user.getId());
+		}
+		System.out.println("User : " + user);
+		String res = studentService.createBulkStudent(req, schoolId);
+		return ResponseEntity.ok(RestResponse.builder().data(res).message("Students Saved successfully")
+				.status(HttpStatus.OK.value()).build());
+	}
 
-        return ResponseEntity.ok(
-                RestResponse.builder()
-                		.data(res)
-                        .message("Teacher registered successfully")
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
-    }
+	@PostMapping("/register/bulkteacher")
+	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity registerBulkTeacher(@RequestBody TeacherBulkRequestDto req,
+			@RequestAttribute("schoolId") Long schoolId) {
+		User user = null;
+		// Check if user already exists
+		Optional<User> opUser = userRepository.findByEmailIgnoreCase(req.getEmail());
+		if (opUser.isPresent()) {
+			user = opUser.get();
+		} else {
+			// Create and save user
+			user = User.builder().email(req.getEmail()).password(passwordEncoder.encode("123456"))
+					.roles(Set.of(RoleEnum.ROLE_TEACHER)).enabled(true).build();
+			user = userRepository.save(user);
+		}
+		req.setUserId(user.getId());
+		String res = teacherService.createBulkTeacher(req, schoolId);
 
-    
+		return ResponseEntity.ok(RestResponse.builder().data(res).message("Teacher registered successfully")
+				.status(HttpStatus.OK.value()).build());
+	}
 
-    @PostMapping("/upload-students")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @Transactional
-    public ResponseEntity<?> uploadStudents(@RequestParam("file") MultipartFile file , @RequestAttribute("schoolId") Long schoolId
-    )
-    {
-        try
-        {
-            String filename = file.getOriginalFilename();
-            if (filename == null || !(filename.endsWith(".xlsx") || filename.endsWith(".xls") || filename.endsWith(".csv")))
-            {
-                return ResponseEntity.badRequest().body("Please upload an Excel or CSV file");
-            }
+	@PostMapping("/upload-students")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@Transactional
+	public ResponseEntity<?> uploadStudents(@RequestParam("file") MultipartFile file,
+			@RequestAttribute("schoolId") Long schoolId) {
+		try {
+			String filename = file.getOriginalFilename();
+			if (filename == null
+					|| !(filename.endsWith(".xlsx") || filename.endsWith(".xls") || filename.endsWith(".csv"))) {
+				return ResponseEntity.badRequest().body("Please upload an Excel or CSV file");
+			}
 
-            List<StudentRequestDto> students = excelStudentParseService.uploadStudents(file, schoolId);
-            List<StudentResponseDto> responses = new ArrayList<>();
+			List<StudentRequestDto> students = excelStudentParseService.uploadStudents(file, schoolId);
+			List<StudentResponseDto> responses = new ArrayList<>();
 
-            for (StudentRequestDto studentDto : students)
-            {
-                var existingUser = userRepository.findByPanNumberIgnoreCase(studentDto.getPanNumber());
-                
-                User user;
-                if (existingUser.isPresent())
-                {
-                    // User exists - reuse for new session/school
-                    user = existingUser.get();
-                    studentDto.setUserId(user.getId());
-                }
-                else
-                {
-                    // Create new user
-                    user = User.builder()
-                            .panNumber(studentDto.getPanNumber())
-                            .password(passwordEncoder.encode(studentDto.getPassword() == null ? "default123" : studentDto.getPassword()))
-                            .roles(Set.of(RoleEnum.ROLE_STUDENT))
-                            .enabled(true)
-                            .build();
-                    userRepository.save(user);
-                    studentDto.setUserId(user.getId());
-                }
+			for (StudentRequestDto studentDto : students) {
+				var existingUser = userRepository.findByPanNumberIgnoreCase(studentDto.getPanNumber());
 
-                StudentResponseDto response = studentService.createStudent(studentDto, schoolId);
-                responses.add(response);
-            }
+				User user;
+				if (existingUser.isPresent()) {
+					// User exists - reuse for new session/school
+					user = existingUser.get();
+					studentDto.setUserId(user.getId());
+				} else {
+					// Create new user
+					user = User.builder().panNumber(studentDto.getPanNumber())
+							.password(passwordEncoder
+									.encode(studentDto.getPassword() == null ? "default123" : studentDto.getPassword()))
+							.roles(Set.of(RoleEnum.ROLE_STUDENT)).enabled(true).build();
+					userRepository.save(user);
+					studentDto.setUserId(user.getId());
+				}
 
-            return ResponseEntity.ok(RestResponse.<List<StudentResponseDto>>builder()
-                    .data(responses)
-                    .message("Students uploaded successfully")
-                    .status(HttpStatus.OK.value())
-                    .build());
+				StudentResponseDto response = studentService.createStudent(studentDto, schoolId);
+				responses.add(response);
+			}
 
-        } catch (Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to upload file: " + e.getMessage());
-        }
-    }
+			return ResponseEntity.ok(RestResponse.<List<StudentResponseDto>>builder().data(responses)
+					.message("Students uploaded successfully").status(HttpStatus.OK.value()).build());
 
-    @PostMapping("/login")
-    public ResponseEntity<RestResponse<AuthResponse>> staffLogin(@RequestBody AuthRequest req)
-    {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
-        UserDetails ud = userDetailsService.loadUserByUsername(req.getEmail());
-        String token = jwtUtil.generateToken(ud);
-        AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
-        return ResponseEntity.ok(
-                RestResponse.<AuthResponse>builder()
-                        .data(resp)
-                        .message("Login successful")
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
-    }
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to upload file: " + e.getMessage());
+		}
+	}
 
-    @PostMapping("/student/login")
-    public ResponseEntity<RestResponse<AuthResponse>> studentLogin(@RequestBody StudentAuthRequest req)
-    {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getPanNumber(), req.getPassword()));
-        UserDetails ud = userDetailsService.loadUserByUsername(req.getPanNumber());
-        String token = jwtUtil.generateToken(ud);
-        AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
-        return ResponseEntity.ok(
-                RestResponse.<AuthResponse>builder()
-                        .data(resp)
-                        .message("Login successful")
-                        .status(HttpStatus.OK.value())
-                        .build()
-        );
-    }
+	@PostMapping("/login")
+	public ResponseEntity<RestResponse<AuthResponse>> staffLogin(@RequestBody AuthRequest req) {
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
+		UserDetails ud = userDetailsService.loadUserByUsername(req.getEmail());
+		String token = jwtUtil.generateToken(ud);
+		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
+		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
+				.status(HttpStatus.OK.value()).build());
+	}
+
+	@PostMapping("/student/login")
+	public ResponseEntity<RestResponse<AuthResponse>> studentLogin(@RequestBody StudentAuthRequest req) {
+		authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(req.getPanNumber(), req.getPassword()));
+		UserDetails ud = userDetailsService.loadUserByUsername(req.getPanNumber());
+		String token = jwtUtil.generateToken(ud);
+		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
+		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
+				.status(HttpStatus.OK.value()).build());
+	}
 }

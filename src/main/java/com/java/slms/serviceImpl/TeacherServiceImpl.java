@@ -308,6 +308,8 @@ public class TeacherServiceImpl implements TeacherService
 
 	        School school = schoolRepository.findById(schoolId).orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
 
+	        User user = userRepository.findById(req.getUserId()).orElseThrow(()->new ResourceNotFoundException("User Not Found"));
+	        
 	        Teacher teacher = new Teacher();
 	        teacher.setContactNumber(req.getMobile());
 	        teacher.setEmail(req.getEmail());
@@ -316,6 +318,7 @@ public class TeacherServiceImpl implements TeacherService
 	        teacher.setJoiningDate(LocalDate.now());
 	        teacher.setStatus(UserStatus.ACTIVE);
 	        teacher.setSchool(school);
+	        teacher.setUser(user);
 	        Teacher savedTeacher = teacherRepository.save(teacher);
 
 	        // Create leave allowance for the teacher in the active session

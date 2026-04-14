@@ -42,64 +42,70 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public String createBulkStudent(StudentBulkRequestDto req, Long schoolId) {
-		Optional<Session> opSess = sessionRepository.findByName(req.getSessionName());
-		if (opSess.isPresent()) {
-			Session session = opSess.get();
-			Optional<ClassEntity> opClass = classEntityRepository
-					.findByClassNameIgnoreCaseAndSessionId(req.getClassName(), session.getId());
+		try {
+			Optional<Session> opSess = sessionRepository.findByName(req.getSessionName());
+			if (opSess.isPresent()) {
+				Session session = opSess.get();
+				Optional<ClassEntity> opClass = classEntityRepository
+						.findByClassNameIgnoreCaseAndSessionId(req.getClassName(), session.getId());
 
-			if (opClass.isPresent()) {
-				ClassEntity classEntity = opClass.get();
-				School school = schoolRepository.findById(schoolId)
-						.orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
+				if (opClass.isPresent()) {
+					ClassEntity classEntity = opClass.get();
+					School school = schoolRepository.findById(schoolId)
+							.orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
 
-				User user = fetchUserByPan(req.getPanNumber());
+					User user = fetchUserByPan(req.getPanNumber());
 
-				Optional<Student> existingStudent = studentRepository.findByPanNumberIgnoreCaseAndSchoolIdAndSessionId(
-						req.getPanNumber(), schoolId, session.getId());
+					Optional<Student> existingStudent = studentRepository.findByPanNumberIgnoreCaseAndSchoolIdAndSessionId(
+							req.getPanNumber(), schoolId, session.getId());
 
-				if (existingStudent.isPresent()) {
-					throw new AlreadyExistException("A student with PEN number '" + req.getPanNumber()
-							+ "' already exists in this school for the current session.");
+					if (existingStudent.isPresent()) {
+						throw new AlreadyExistException("A student with PEN number '" + req.getPanNumber()
+								+ "' already exists in this school for the current session.");
+					}
+					
+					// Check duplicate class for same name and session
+					Optional<ClassEntity> duplicateClass = classEntityRepository.findByClassNameIgnoreCaseAndSessionIdAndSchoolId(
+							classEntity.getClassName(), session.getId(), schoolId);
+
+					if (duplicateClass.isPresent() && !duplicateClass.get().getId().equals(classEntity.getId())) {
+						throw new AlreadyExistException(
+								"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
+					}
+			
+					Student student = new Student();
+					student.setGender(Gender.valueOf(req.getGender().toUpperCase()));
+					student.setMobileNumber(req.getMobile());
+					student.setName(req.getName());
+					student.setParentName(req.getFatherName());
+					student.setStatus(UserStatus.ACTIVE);
+					student.setClassRollNumber(getNextRollNumber(classEntity.getId(), schoolId));
+					student.setCurrentClass(classEntity);
+					student.setUser(user);
+					student.setSchool(school);
+					student.setSession(session);
+					student.setPanNumber(req.getPanNumber());
+					
+					Student savedStudent = studentRepository.save(student);
+					
+					StudentEnrollments studentEnrollments = new StudentEnrollments();
+					studentEnrollments.setStudent(savedStudent);
+					studentEnrollments.setSchool(school);
+					studentEnrollments.setClassEntity(classEntity);
+					studentEnrollments.setSession(session);
+					studentEnrollmentRepository.save(studentEnrollments);		
+
+					return "success";
+				} else {
+					return "Class Not Found";
 				}
-				
-				// Check duplicate class for same name and session
-				Optional<ClassEntity> duplicateClass = classEntityRepository.findByClassNameIgnoreCaseAndSessionIdAndSchoolId(
-						classEntity.getClassName(), session.getId(), schoolId);
 
-				if (duplicateClass.isPresent() && !duplicateClass.get().getId().equals(classEntity.getId())) {
-					throw new AlreadyExistException(
-							"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
-				}
-		
-				Student student = new Student();
-				student.setGender(Gender.valueOf(req.getGender()));
-				student.setMobileNumber(req.getMobile());
-				student.setName(req.getName());
-				student.setParentName(req.getFatherName());
-				student.setStatus(UserStatus.ACTIVE);
-				student.setClassRollNumber(getNextRollNumber(classEntity.getId(), schoolId));
-				student.setCurrentClass(classEntity);
-				student.setUser(user);
-				student.setSchool(school);
-				student.setSession(session);
-		
-				Student savedStudent = studentRepository.save(student);
-				
-				StudentEnrollments studentEnrollments = new StudentEnrollments();
-				studentEnrollments.setStudent(savedStudent);
-				studentEnrollments.setSchool(school);
-				studentEnrollments.setClassEntity(classEntity);
-				studentEnrollments.setSession(session);
-				studentEnrollmentRepository.save(studentEnrollments);		
-
-				return "success";
 			} else {
-				return "Class Not Found";
+				return "Session Not Found !";
 			}
-
-		} else {
-			return "Session Not Found !";
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			return "failed";
 		}
 	}
 

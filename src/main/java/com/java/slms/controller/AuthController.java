@@ -226,6 +226,7 @@ public class AuthController {
 		}
 		System.out.println("User : " + user);
 		String res = studentService.createBulkStudent(req, schoolId);
+		System.out.println(res);
 		return ResponseEntity.ok(RestResponse.builder().data(res).message("Students Saved successfully")
 				.status(HttpStatus.OK.value()).build());
 	}

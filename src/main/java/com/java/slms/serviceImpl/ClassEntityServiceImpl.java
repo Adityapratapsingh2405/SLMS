@@ -77,19 +77,25 @@ public class ClassEntityServiceImpl implements ClassEntityService
                 throw new WrongArgumentException("Teacher with id " + classRequestDto.getClassTeacherId() + " is already assigned to another class.");
             }
         }
-
+        System.out.println("Teacher not assign");
         // Map and save class
-        ClassEntity classEntity = modelMapper.map(classRequestDto, ClassEntity.class);
+        
+        ClassEntity classEntity = new ClassEntity();
+        classEntity.setClassName(classRequestDto.getClassName());
         classEntity.setSession(session);
         classEntity.setClassTeacher(teacher);
         classEntity.setId(null);
         classEntity.setSchool(school);
         ClassEntity savedEntity = classEntityRepository.save(classEntity);
 
+        System.out.println("Before Fees Structure");
+        
         // Save fee structure
         FeeStructure feeStructure = FeeStructure.builder().feesAmount(classRequestDto.getFeesAmount()).session(session).classEntity(savedEntity).school(school).build();
 
         feeStructureRepository.save(feeStructure);
+        
+        System.out.println("After Fees Structure");
 
         // Build response
         ClassResponseDto response = modelMapper.map(savedEntity, ClassResponseDto.class);

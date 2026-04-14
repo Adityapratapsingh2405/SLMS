@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,9 @@ public class StudentServiceImpl implements StudentService {
 						throw new AlreadyExistException(
 								"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
 					}
+					
+					 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				     LocalDate dob = LocalDate.parse(req.getDob(), formatter);
 			
 					Student student = new Student();
 					student.setGender(Gender.valueOf(req.getGender().toUpperCase()));
@@ -85,6 +89,8 @@ public class StudentServiceImpl implements StudentService {
 					student.setSchool(school);
 					student.setSession(session);
 					student.setPanNumber(req.getPanNumber());
+					student.setAddress(req.getAddress());
+					student.setDateOfBirth(dob);
 					
 					Student savedStudent = studentRepository.save(student);
 					
@@ -105,7 +111,7 @@ public class StudentServiceImpl implements StudentService {
 			}
 		}catch(Exception ex) {
 			ex.printStackTrace();
-			return "failed";
+			return "Error : " + ex.getMessage();
 		}
 	}
 

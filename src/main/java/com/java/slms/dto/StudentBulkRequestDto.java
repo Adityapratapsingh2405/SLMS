@@ -28,6 +28,8 @@ public class StudentBulkRequestDto
     private String sessionName;
     private String fatherName;
     private String mobile;
+    private String dob;
+    private String address;
     private Long userId;
    
 }

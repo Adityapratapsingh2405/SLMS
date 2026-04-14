@@ -74,7 +74,7 @@ public class StudentServiceImpl implements StudentService {
 								"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
 					}
 					
-					 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
 				     LocalDate dob = LocalDate.parse(req.getDob(), formatter);
 			
 					Student student = new Student();

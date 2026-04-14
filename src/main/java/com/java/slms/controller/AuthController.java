@@ -219,7 +219,7 @@ public class AuthController {
 			req.setUserId(user.getId());
 		} else {
 			// Create new user account
-			user = User.builder().panNumber(req.getPanNumber()).password(passwordEncoder.encode("123456"))
+			user = User.builder().panNumber(req.getPanNumber()).password(passwordEncoder.encode(req.getMobile()))
 					.roles(Set.of(RoleEnum.ROLE_STUDENT)).enabled(true).build();
 			userRepository.save(user);
 			req.setUserId(user.getId());
@@ -243,7 +243,7 @@ public class AuthController {
 			user = opUser.get();
 		} else {
 			// Create and save user
-			user = User.builder().email(req.getEmail()).password(passwordEncoder.encode("123456"))
+			user = User.builder().email(req.getEmail()).password(passwordEncoder.encode(req.getMobile()))
 					.roles(Set.of(RoleEnum.ROLE_TEACHER)).enabled(true).build();
 			user = userRepository.save(user);
 		}

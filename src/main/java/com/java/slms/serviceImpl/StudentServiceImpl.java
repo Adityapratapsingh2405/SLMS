@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,8 +76,14 @@ public class StudentServiceImpl implements StudentService {
 								"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
 					}
 					
-					 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
-				     LocalDate dob = LocalDate.parse(req.getDob(), formatter);
+//					 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+//				     LocalDate dob = LocalDate.parse(req.getDob(), formatter);
+					DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+					        .appendPattern("dd/MM/")
+					        .appendValueReduced(ChronoField.YEAR, 2, 4, 2000) 
+					        .toFormatter();
+
+					LocalDate dob = LocalDate.parse(req.getDob(), formatter);
 			
 					Student student = new Student();
 					student.setGender(Gender.valueOf(req.getGender().toUpperCase()));

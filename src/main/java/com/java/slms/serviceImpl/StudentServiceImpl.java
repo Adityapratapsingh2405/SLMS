@@ -84,6 +84,10 @@ public class StudentServiceImpl implements StudentService {
 					        .toFormatter();
 
 					LocalDate dob = LocalDate.parse(req.getDob(), formatter);
+					
+					Optional<Student> opStud = studentRepository.findByPanNumberIgnoreCase(req.getPanNumber());
+					if(opStud.isPresent())
+						return "Already Exist";
 			
 					Student student = new Student();
 					student.setGender(Gender.valueOf(req.getGender().toUpperCase()));

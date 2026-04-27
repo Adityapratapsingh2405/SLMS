@@ -47,8 +47,10 @@ public class StudentServiceImpl implements StudentService {
 	public String createBulkStudent(StudentBulkRequestDto req, Long schoolId) {
 		try {
 			Optional<Session> opSess = sessionRepository.findByName(req.getSessionName());
+			
 			if (opSess.isPresent()) {
 				Session session = opSess.get();
+				
 				Optional<ClassEntity> opClass = classEntityRepository
 						.findByClassNameIgnoreCaseAndSessionId(req.getClassName(), session.getId());
 
@@ -106,12 +108,45 @@ public class StudentServiceImpl implements StudentService {
 					
 					Student savedStudent = studentRepository.save(student);
 					
+
+					FeeStructure feeStructure = feeStructureRepository
+							.findByClassEntity_IdAndSession_IdAndSchool_Id(classEntity.getId(), session.getId(),
+									schoolId)
+							.orElseThrow(() -> new ResourceNotFoundException(
+									"Fee structure not found for class " + classEntity.getClassName() + " and session "
+											+ session.getName() + " in school ID: " + schoolId));
+
+					List<Fee> feeEntries = new ArrayList<>();
+					LocalDate currentMonth = session.getStartDate().withDayOfMonth(1);
+
+					for (int i = 0; i < 12; i++) {
+						Fee fee = new Fee();
+						fee.setMonth(FeeMonth.valueOf(currentMonth.getMonth().toString()));
+						fee.setYear(currentMonth.getYear());
+						fee.setStatus(FeeStatus.PENDING);
+						fee.setAmount(feeStructure.getFeesAmount());
+						fee.setFeeStructure(feeStructure);
+						fee.setClassEntity(classEntity);
+						fee.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+						fee.setStudent(savedStudent);
+						fee.setSchool(school);
+						fee.setSession(session); // Link fee to session
+
+						feeEntries.add(fee);
+						currentMonth = currentMonth.plusMonths(1);
+					}
+
+					feeRepository.saveAll(feeEntries);
+					
+					
 					StudentEnrollments studentEnrollments = new StudentEnrollments();
 					studentEnrollments.setStudent(savedStudent);
 					studentEnrollments.setSchool(school);
 					studentEnrollments.setClassEntity(classEntity);
 					studentEnrollments.setSession(session);
-					studentEnrollmentRepository.save(studentEnrollments);		
+					studentEnrollmentRepository.save(studentEnrollments);	
+					
+					
 
 					return "success";
 				} else {

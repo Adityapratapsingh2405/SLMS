@@ -8,8 +8,8 @@ import com.java.slms.model.Transport;
 
 public interface TransportService
 {
-    boolean saveTransport(Transport ob);
+    boolean saveTransport(Transport ob,Long schoolId);
     boolean updateTransport(Transport ob);
     boolean deleteTransport(Transport ob);
-    List<Transport> listAll();
+    List<Transport> listAll(Long schoolId);
 }

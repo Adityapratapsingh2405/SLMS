@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,21 +23,24 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/trans")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+
 public class TransportController 
 {
 	@Autowired
 	private TransportService transService;
 	
 	@PostMapping("/save")
-	public ResponseEntity saveTrans(@RequestBody Transport ob) 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity saveTrans(@RequestBody Transport ob,
+			@RequestAttribute("schoolId") Long schoolId) 
 	{
-		boolean status = transService.saveTransport(ob);
+		boolean status = transService.saveTransport(ob,schoolId);
 		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Save Done":"Route Save Failed")
 				.message("Route Saved successfully")
 				.status(HttpStatus.OK.value()).build());
 	}
 	@PutMapping("/update")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity updateTrans(@RequestBody Transport ob) 
 	{
 		boolean status = transService.updateTransport(ob);
@@ -44,6 +48,7 @@ public class TransportController
 				.status(HttpStatus.OK.value()).build());
 	}
 	@DeleteMapping("/delete")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity deleteTrans(@RequestBody Transport ob) 
 	{
 		boolean status = transService.deleteTransport(ob);
@@ -51,9 +56,10 @@ public class TransportController
 				.status(HttpStatus.OK.value()).build());
 	}
 	@GetMapping("/list")
-	public ResponseEntity listTrans() 
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")
+	public ResponseEntity listTrans(@RequestAttribute("schoolId") Long schoolId) 
 	{
-		return ResponseEntity.ok(RestResponse.builder().data(transService.listAll())
+		return ResponseEntity.ok(RestResponse.builder().data(transService.listAll(schoolId))
 				.status(HttpStatus.OK.value()).build());
 	}
 }

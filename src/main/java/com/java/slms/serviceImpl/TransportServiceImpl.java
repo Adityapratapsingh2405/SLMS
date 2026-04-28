@@ -16,7 +16,8 @@ public class TransportServiceImpl implements TransportService
 	private TransportRepository transRepo;
 
 	@Override
-	public boolean saveTransport(Transport ob) {
+	public boolean saveTransport(Transport ob,Long schoolId) {
+		ob.setSchoolId(schoolId);
 		transRepo.save(ob);
 		return true;
 	}
@@ -34,8 +35,8 @@ public class TransportServiceImpl implements TransportService
 	}
 
 	@Override
-	public List<Transport> listAll() {
-		return transRepo.findAll();
+	public List<Transport> listAll(Long schoolId) {
+		return transRepo.findBySchoolId(schoolId);
 	}
 
 }

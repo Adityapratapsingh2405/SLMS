@@ -3,6 +3,7 @@ package com.java.slms.security;
 import com.java.slms.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,12 @@ public class JwtAuthFilter extends OncePerRequestFilter
 {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
+    
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    	String url = request.getRequestURI();
+    	return url.contains("/dev/schools");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

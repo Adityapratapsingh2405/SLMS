@@ -26,7 +26,9 @@ import lombok.RequiredArgsConstructor;
 
 public class TransportController 
 {
-	
+	  @Autowired
+		private TransportService transService;
+	  
 	@GetMapping("/list")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")
 	public ResponseEntity listTrans(@RequestAttribute("schoolId") Long schoolId) 

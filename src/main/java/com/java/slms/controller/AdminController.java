@@ -43,6 +43,8 @@ public class AdminController
 	public ResponseEntity saveTrans(@RequestBody Transport ob,
 			@RequestAttribute("schoolId") Long schoolId) 
 	{
+		System.out.println(schoolId);
+		System.out.println(ob);
 		boolean status = transService.saveTransport(ob,schoolId);
 		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Save Done":"Route Save Failed")
 				.message("Route Saved successfully")

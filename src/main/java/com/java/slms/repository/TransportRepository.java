@@ -16,5 +16,5 @@ import java.util.Optional;
 @Repository
 public interface TransportRepository extends JpaRepository<Transport, Long>
 {
-	List<Transport> findBySchoolId(Long schoolId);
+	List<Transport> findBySchool(Long school);
 }

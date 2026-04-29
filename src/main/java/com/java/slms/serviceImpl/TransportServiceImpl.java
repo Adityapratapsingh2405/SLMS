@@ -36,7 +36,7 @@ public class TransportServiceImpl implements TransportService
 
 	@Override
 	public List<Transport> listAll(Long schoolId) {
-		return transRepo.findBySchoolId(schoolId);
+		return transRepo.findBySchool(schoolId);
 	}
 
 }

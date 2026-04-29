@@ -26,35 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 public class TransportController 
 {
-	@Autowired
-	private TransportService transService;
 	
-	@PostMapping("/save")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity saveTrans(@RequestBody Transport ob,
-			@RequestAttribute("schoolId") Long schoolId) 
-	{
-		boolean status = transService.saveTransport(ob,schoolId);
-		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Save Done":"Route Save Failed")
-				.message("Route Saved successfully")
-				.status(HttpStatus.OK.value()).build());
-	}
-	@PutMapping("/update")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity updateTrans(@RequestBody Transport ob) 
-	{
-		boolean status = transService.updateTransport(ob);
-		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Update Done":"Route Update Failed")
-				.status(HttpStatus.OK.value()).build());
-	}
-	@DeleteMapping("/delete")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity deleteTrans(@RequestBody Transport ob) 
-	{
-		boolean status = transService.deleteTransport(ob);
-		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Delete Done":"Route Delete Failed")
-				.status(HttpStatus.OK.value()).build());
-	}
 	@GetMapping("/list")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")
 	public ResponseEntity listTrans(@RequestAttribute("schoolId") Long schoolId) 

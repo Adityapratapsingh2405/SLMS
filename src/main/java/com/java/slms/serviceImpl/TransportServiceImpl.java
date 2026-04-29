@@ -17,7 +17,7 @@ public class TransportServiceImpl implements TransportService
 
 	@Override
 	public boolean saveTransport(Transport ob,Long schoolId) {
-		ob.setSchoolId(schoolId);
+		ob.setSchool(schoolId);
 		transRepo.save(ob);
 		return true;
 	}

@@ -31,5 +31,5 @@ public class Transport extends BaseEntity
     private String note;    
     
     @Column
-    private Long schoolId;
+    private Long school;
 }

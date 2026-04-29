@@ -1,5 +1,6 @@
 package com.java.slms.controller;
 
+import com.java.slms.dto.TransportDto;
 import com.java.slms.dto.UserRequest;
 import com.java.slms.model.Transport;
 import com.java.slms.payload.RestResponse;
@@ -40,7 +41,7 @@ public class AdminController
 	
 	@PostMapping("/transsave")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity saveTrans(@RequestBody Transport ob,
+	public ResponseEntity saveTrans(@RequestBody TransportDto ob,
 			@RequestAttribute("schoolId") Long schoolId) 
 	{
 		System.out.println(schoolId);

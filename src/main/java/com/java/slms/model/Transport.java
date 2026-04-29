@@ -1,5 +1,7 @@
 package com.java.slms.model;
 
+import com.java.slms.dto.TransportDto;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,4 +34,15 @@ public class Transport extends BaseEntity
     
     @Column
     private Long school;
+
+	public Transport(TransportDto ob) {
+		super();
+		this.routeTitle = ob.getRouteTitle();
+		this.pickUpLocation = ob.getPickUpLocation();
+		this.pickUpTime = ob.getPickUpTime();
+		this.dropTime = ob.getDropTime();
+		this.note = ob.getNote();
+	}
+    
+    
 }

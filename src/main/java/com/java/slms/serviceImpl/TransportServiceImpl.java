@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.java.slms.dto.TransportDto;
 import com.java.slms.model.Transport;
 import com.java.slms.repository.TransportRepository;
 import com.java.slms.service.TransportService;
@@ -16,9 +17,12 @@ public class TransportServiceImpl implements TransportService
 	private TransportRepository transRepo;
 
 	@Override
-	public boolean saveTransport(Transport ob,Long schoolId) {
-		ob.setSchool(schoolId);
-		transRepo.save(ob);
+	public boolean saveTransport(TransportDto ob,Long schoolId) {
+		
+		Transport tp = new Transport(ob);
+		
+		tp.setSchool(schoolId);
+		transRepo.save(tp);
 		return true;
 	}
 

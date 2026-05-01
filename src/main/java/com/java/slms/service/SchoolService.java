@@ -16,4 +16,8 @@ public interface SchoolService
     SchoolResponseDto updateSchool(Long id, SchoolRequestDto requestDto);
 
     void deleteSchool(Long id);
+    
+    boolean isActiveSchool(Long id);
+
+	void deactiveSchool(Long id);
 }

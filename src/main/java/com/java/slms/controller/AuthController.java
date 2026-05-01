@@ -4,6 +4,7 @@ import com.java.slms.dto.*;
 import com.java.slms.model.User;
 import com.java.slms.payload.RestResponse;
 import com.java.slms.repository.UserRepository;
+import com.java.slms.security.CustomUserDetails;
 import com.java.slms.security.CustomUserDetailsService;
 import com.java.slms.service.*;
 import com.java.slms.util.JwtUtil;
@@ -300,13 +301,24 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<RestResponse<AuthResponse>> staffLogin(@RequestBody AuthRequest req) {
+	public ResponseEntity<RestResponse<AuthResponse>> staffLogin(@RequestBody AuthRequest req) 
+	{
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
 		UserDetails ud = userDetailsService.loadUserByUsername(req.getEmail());
-		String token = jwtUtil.generateToken(ud);
-		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
-		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
-				.status(HttpStatus.OK.value()).build());
+		
+		CustomUserDetails customUserDetails = (CustomUserDetails) ud;
+        Long schoolId = customUserDetails.getSchoolId();
+        
+        boolean isActiveSchool = schoolService.isActiveSchool(schoolId);
+        if(isActiveSchool) {
+        	String token = jwtUtil.generateToken(ud);
+    		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
+    		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
+    				.status(HttpStatus.OK.value()).build());
+        }else {
+        	return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        					.body(RestResponse.<AuthResponse>builder().data(null).message("Login Failed").build());
+        }	
 	}
 
 	@PostMapping("/student/login")
@@ -314,9 +326,24 @@ public class AuthController {
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(req.getPanNumber(), req.getPassword()));
 		UserDetails ud = userDetailsService.loadUserByUsername(req.getPanNumber());
-		String token = jwtUtil.generateToken(ud);
-		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
-		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
-				.status(HttpStatus.OK.value()).build());
+		
+		CustomUserDetails customUserDetails = (CustomUserDetails) ud;
+        Long schoolId = customUserDetails.getSchoolId();
+        
+        boolean isActiveSchool = schoolService.isActiveSchool(schoolId);
+        if(isActiveSchool) {
+        	String token = jwtUtil.generateToken(ud);
+    		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
+    		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
+    				.status(HttpStatus.OK.value()).build());
+        }else {
+        	return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+        					.body(RestResponse.<AuthResponse>builder().data(null).message("Login Failed").build());
+        }	
+		
+//		String token = jwtUtil.generateToken(ud);
+//		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);
+//		return ResponseEntity.ok(RestResponse.<AuthResponse>builder().data(resp).message("Login successful")
+//				.status(HttpStatus.OK.value()).build());
 	}
 }

@@ -30,4 +30,6 @@ public class School extends BaseEntity
     
     @Column(name = "school_tagline")
     private String schoolTagline;
+    
+    private Boolean status;
 }

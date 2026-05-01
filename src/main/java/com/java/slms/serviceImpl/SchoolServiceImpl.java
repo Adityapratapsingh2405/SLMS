@@ -42,6 +42,7 @@ public class SchoolServiceImpl implements SchoolService
     public List<SchoolResponseDto> getAllSchools()
     {
         return schoolRepository.findAll().stream()
+        		.filter(s->s.getStatus())
                 .map(school -> modelMapper.map(school, SchoolResponseDto.class))
                 .collect(Collectors.toList());
     }
@@ -63,4 +64,19 @@ public class SchoolServiceImpl implements SchoolService
                 .orElseThrow(() -> new ResourceNotFoundException("School not found"));
         schoolRepository.deleteById(id);
     }
+
+	@Override
+	public boolean isActiveSchool(Long id) {
+		School school = schoolRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("School not found"));
+		return school.getStatus();
+	}
+
+	@Override
+	public void deactiveSchool(Long id) {
+		School school = schoolRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("School not found"));
+		school.setStatus(false);
+		schoolRepository.save(school);
+	}
 }

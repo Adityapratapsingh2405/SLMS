@@ -36,7 +36,13 @@ public class DevController
 	@GetMapping("/schools")
 	public ResponseEntity<List<SchoolResponseDto>> getSchools()
 	{
-		List<SchoolResponseDto> list = schoolService.getAllSchools();
+		List<SchoolResponseDto> list = schoolService.getAllSchools(true);
+		return ResponseEntity.ok(list);
+	}
+	@GetMapping("/deactiveschools")
+	public ResponseEntity<List<SchoolResponseDto>> getDeactiveSchools()
+	{
+		List<SchoolResponseDto> list = schoolService.getAllSchools(false);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -51,6 +57,12 @@ public class DevController
 	public ResponseEntity<String> deActiveSchool(@PathVariable(value = "id") Long id)
 	{
 		schoolService.deactiveSchool(id);
+		return ResponseEntity.ok("success");
+	}
+	@GetMapping("/activeschool/{id}")
+	public ResponseEntity<String> activeSchool(@PathVariable(value = "id") Long id)
+	{
+		schoolService.activeSchool(id);
 		return ResponseEntity.ok("success");
 	}
 }

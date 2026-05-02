@@ -66,6 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter
                 SecurityContextHolder.getContext().setAuthentication(authToken);
                 Long schoolId = jwtUtil.extractSchoolId(jwt);
                 request.setAttribute("schoolId", schoolId);
+                
             }
         }
 

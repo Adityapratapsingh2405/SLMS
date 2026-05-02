@@ -39,10 +39,10 @@ public class SchoolServiceImpl implements SchoolService
     }
 
     @Override
-    public List<SchoolResponseDto> getAllSchools()
+    public List<SchoolResponseDto> getAllSchools(boolean status)
     {
         return schoolRepository.findAll().stream()
-        		.filter(s->s.getStatus())
+        		.filter(s->status)
                 .map(school -> modelMapper.map(school, SchoolResponseDto.class))
                 .collect(Collectors.toList());
     }
@@ -77,6 +77,14 @@ public class SchoolServiceImpl implements SchoolService
 		School school = schoolRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("School not found"));
 		school.setStatus(false);
+		schoolRepository.save(school);
+	}
+
+	@Override
+	public void activeSchool(Long id) {
+		School school = schoolRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("School not found"));
+		school.setStatus(true);
 		schoolRepository.save(school);
 	}
 }

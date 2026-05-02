@@ -11,7 +11,7 @@ public interface SchoolService
 
     SchoolResponseDto getSchool(Long id);
 
-    List<SchoolResponseDto> getAllSchools();
+    List<SchoolResponseDto> getAllSchools(boolean status);
 
     SchoolResponseDto updateSchool(Long id, SchoolRequestDto requestDto);
 
@@ -20,4 +20,6 @@ public interface SchoolService
     boolean isActiveSchool(Long id);
 
 	void deactiveSchool(Long id);
+
+	void activeSchool(Long id);
 }

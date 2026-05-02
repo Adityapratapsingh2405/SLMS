@@ -42,7 +42,7 @@ public class SchoolServiceImpl implements SchoolService
     public List<SchoolResponseDto> getAllSchools(boolean status)
     {
         return schoolRepository.findAll().stream()
-        		.filter(s->status)
+        		.filter(s->s.getStatus()==status)
                 .map(school -> modelMapper.map(school, SchoolResponseDto.class))
                 .collect(Collectors.toList());
     }

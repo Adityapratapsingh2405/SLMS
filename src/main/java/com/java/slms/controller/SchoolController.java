@@ -68,7 +68,7 @@ public class SchoolController
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     public ResponseEntity<RestResponse<List<SchoolResponseDto>>> getAllSchools()
     {
-        List<SchoolResponseDto> schools = schoolService.getAllSchools();
+        List<SchoolResponseDto> schools = schoolService.getAllSchools(true);
         return ResponseEntity.ok(
                 RestResponse.<List<SchoolResponseDto>>builder()
                         .data(schools)

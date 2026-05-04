@@ -56,8 +56,15 @@ public class AdminController
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity updateTrans(@PathVariable(value = "id") Long id,@RequestBody Transport ob) 
 	{
-		ob.setId(id);
-		boolean status = transService.updateTransport(ob);
+		Transport t = transService.getByID(id);
+		
+		t.setRouteTitle(ob.getRouteTitle());
+		t.setPickUpLocation(ob.getPickUpLocation());
+		t.setPickUpTime(ob.getPickUpTime());
+		t.setDropTime(ob.getDropTime());
+		t.setNote(ob.getNote());
+		
+		boolean status = transService.updateTransport(t);
 		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Update Done":"Route Update Failed")
 				.status(HttpStatus.OK.value()).build());
 	}

@@ -13,4 +13,5 @@ public interface TransportService
     boolean updateTransport(Transport ob);
     boolean deleteTransport(Transport ob);
     List<Transport> listAll(Long schoolId);
+	Transport getByID(Long id);
 }

@@ -43,4 +43,9 @@ public class TransportServiceImpl implements TransportService
 		return transRepo.findBySchool(schoolId);
 	}
 
+	@Override
+	public Transport getByID(Long id) {
+		return transRepo.findById(id).orElseThrow();
+	}
+
 }

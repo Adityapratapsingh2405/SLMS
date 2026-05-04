@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -51,18 +52,19 @@ public class AdminController
 				.message("Route Saved successfully")
 				.status(HttpStatus.OK.value()).build());
 	}
-	@PutMapping("/transupdate")
+	@PutMapping("/transupdate/{id}")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity updateTrans(@RequestBody Transport ob) 
+	public ResponseEntity updateTrans(@PathVariable(value = "id") Long id,@RequestBody Transport ob) 
 	{
+		ob.setId(id);
 		boolean status = transService.updateTransport(ob);
 		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Update Done":"Route Update Failed")
 				.status(HttpStatus.OK.value()).build());
 	}
-	@DeleteMapping("/transdelete")
-//	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity deleteTrans(@RequestBody Transport ob) 
+	@DeleteMapping("/transdelete/{id}")
+	public ResponseEntity deleteTrans(@PathVariable(value = "id") Long id) 
 	{
+		Transport ob = transService.getByID(id);
 		boolean status = transService.deleteTransport(ob);
 		return ResponseEntity.ok(RestResponse.builder().data(status?"Route Delete Done":"Route Delete Failed")
 				.status(HttpStatus.OK.value()).build());

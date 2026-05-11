@@ -19,4 +19,8 @@ public interface FeeService
     //    @Scheduled(cron = "0 0 0 15 * ?")  // Runs at midnight on the 15th day of every month
     @Transactional
     void markPendingFeesAsOverdue(Long schoolid);
+
+	void edit(String receiptNumber, Float amount);
+
+	void delete(String receiptNumber);
 }

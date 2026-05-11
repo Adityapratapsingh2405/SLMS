@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface FeeRepository extends JpaRepository<Fee, Long>
 {
@@ -70,4 +71,5 @@ public interface FeeRepository extends JpaRepository<Fee, Long>
             "WHERE f.receiptNumber = :receiptNumber")
     boolean existsByReceiptNumber(@Param("receiptNumber") String receiptNumber);
 
+    Optional<Fee> findByReceiptNumber(String receiptNumber);
 }

@@ -344,4 +344,27 @@ public class FeeServiceImpl implements FeeService
 
         return LocalDate.of(year, monthNumber, 10);
     }
+
+	@Override
+	public void edit(String receiptNumber, Float amount) {
+		
+		Optional<Fee> feeOp = feeRepository.findByReceiptNumber(receiptNumber);
+		if(feeOp.isPresent()) {
+			Fee fee = feeOp.get();
+			fee.setAmount((double)amount);
+			feeRepository.save(fee);
+		}
+	}
+
+	@Override
+	public void delete(String receiptNumber) {
+		Optional<Fee> feeOp = feeRepository.findByReceiptNumber(receiptNumber);
+		if(feeOp.isPresent()) {
+			Fee fee = feeOp.get();
+			fee.setAmount(0.0);
+			fee.setStatus(FeeStatus.PENDING);
+			fee.setReceiptNumber(null);
+			feeRepository.save(fee);
+		}
+	}
 }

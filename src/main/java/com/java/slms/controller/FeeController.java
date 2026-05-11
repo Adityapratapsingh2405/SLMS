@@ -28,6 +28,23 @@ public class FeeController
 {
 
     private final FeeService feeService;
+    
+    
+    @PutMapping(value = "/edit/{amt}/{receipt}")
+    public String editFees(@PathVariable(value = "amt") Float amount , @PathVariable(value = "receipt") String receiptNumber) 
+    {
+    	feeService.edit(receiptNumber,amount);
+    	return "success";
+    }
+    @DeleteMapping(value = "/delete/{receipt}")
+    public String delFees(@PathVariable(value = "receipt") String receiptNumber) 
+    {
+    	feeService.delete(receiptNumber);
+    	return "success";
+    }
+    
+    
+    
 
     @Operation(
             summary = "Pay fees for a student",

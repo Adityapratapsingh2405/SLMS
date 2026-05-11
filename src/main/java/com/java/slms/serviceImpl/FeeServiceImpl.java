@@ -361,8 +361,8 @@ public class FeeServiceImpl implements FeeService
 		Optional<Fee> feeOp = feeRepository.findByReceiptNumber(receiptNumber);
 		if(feeOp.isPresent()) {
 			Fee fee = feeOp.get();
-			fee.setAmount(0.0);
 			fee.setStatus(FeeStatus.PENDING);
+			fee.setPaymentDate(null);
 			fee.setReceiptNumber(null);
 			feeRepository.save(fee);
 		}

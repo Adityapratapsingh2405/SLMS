@@ -2,8 +2,11 @@ package com.java.slms.service;
 
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
+import com.java.slms.model.Fee;
+
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface FeeService
@@ -23,4 +26,6 @@ public interface FeeService
 	void edit(String receiptNumber, Float amount);
 
 	void delete(String receiptNumber);
+
+	List<Fee> listByDate(LocalDate date);
 }

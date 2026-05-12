@@ -490,7 +490,8 @@ public class ScoreServiceImpl implements ScoreService
     }
     
     @Override
-    public StudentResultsDTO getStudentAllResults(String panNumber) {
+    public StudentResultsDTO getStudentAllResults(String panNumber) 
+    {
         Student student = studentRepository.findById(panNumber)
             .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
         
@@ -543,9 +544,10 @@ public class ScoreServiceImpl implements ScoreService
                     
                     if (scoreOpt.isPresent()) {
                         Score score = scoreOpt.get();
+                        
                         subjectScore.setMarks(score.getMarks());
                         subjectScore.setGrade(score.getGrade());
-                        totalObtained += score.getMarks();
+                        totalObtained += score.getMarks()==null?0:score.getMarks();
                         subjectsWithScores++;
                     } else {
                         // Score not entered yet

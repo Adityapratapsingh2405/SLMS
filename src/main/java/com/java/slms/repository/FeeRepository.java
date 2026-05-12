@@ -72,4 +72,9 @@ public interface FeeRepository extends JpaRepository<Fee, Long>
     boolean existsByReceiptNumber(@Param("receiptNumber") String receiptNumber);
 
     Optional<Fee> findByReceiptNumber(String receiptNumber);
+
+    @Query("SELECT F FROM Fee F WHERE paymentDate = :date AND status = :status")
+    List<Fee> findByDateAndStatus(
+            @Param("date") LocalDate date,
+            @Param("status") String status);
 }

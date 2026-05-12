@@ -2,6 +2,7 @@ package com.java.slms.controller;
 
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
+import com.java.slms.model.Fee;
 import com.java.slms.payload.RestResponse;
 import com.java.slms.service.FeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,11 +12,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -29,6 +33,16 @@ public class FeeController
 
     private final FeeService feeService;
     
+    
+    @GetMapping("/listbydate/{date}")
+    public ResponseEntity<List<Fee>> listByDate(
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate date)
+    {
+    	List<Fee> list = feeService.listByDate(date);
+    	return ResponseEntity.ok(list);
+    }
     
     @PutMapping(value = "/edit/{amt}/{receipt}")
     public String editFees(@PathVariable(value = "amt") Float amount , @PathVariable(value = "receipt") String receiptNumber) 

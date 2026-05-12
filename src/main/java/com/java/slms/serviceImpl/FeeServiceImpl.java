@@ -349,9 +349,25 @@ public class FeeServiceImpl implements FeeService
 	public void edit(String receiptNumber, Float amount) {
 		
 		Optional<Fee> feeOp = feeRepository.findByReceiptNumber(receiptNumber);
-		if(feeOp.isPresent()) {
+		if(feeOp.isPresent()) 
+		{
 			Fee fee = feeOp.get();
-			fee.setAmount((double)amount);
+			
+			ClassEntity ce = fee.getClassEntity();
+			double monthfee = ce.getFeeStructures().getFeesAmount();
+			double payfee = (double)amount;
+						
+			
+			if(payfee < monthfee) {
+				fee.setAmount(payfee);
+				fee.setStatus(FeeStatus.PENDING);
+			}				
+			else
+			{
+				fee.setAmount(monthfee);
+				fee.setStatus(FeeStatus.PAID);
+			}
+			
 			feeRepository.save(fee);
 		}
 	}
@@ -366,5 +382,11 @@ public class FeeServiceImpl implements FeeService
 			fee.setReceiptNumber(null);
 			feeRepository.save(fee);
 		}
+	}
+
+	@Override
+	public List<Fee> listByDate(LocalDate date) 
+	{
+		return feeRepository.findByDateAndStatus(date,"PAID");
 	}
 }

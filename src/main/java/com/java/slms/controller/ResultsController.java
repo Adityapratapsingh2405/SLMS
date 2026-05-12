@@ -58,6 +58,8 @@ public class ResultsController {
             StudentResultsDTO results = scoreService.getStudentAllResults(panNumber);
             return ResponseEntity.ok(results);
         } catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

@@ -2,9 +2,14 @@ package com.java.slms.controller;
 
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
+import com.java.slms.model.ClassEntity;
 import com.java.slms.model.Fee;
+import com.java.slms.model.School;
+import com.java.slms.model.Session;
 import com.java.slms.payload.RestResponse;
 import com.java.slms.service.FeeService;
+import com.java.slms.service.SchoolService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fees")
@@ -32,16 +39,85 @@ public class FeeController
 {
 
     private final FeeService feeService;
+    private final SchoolService schoolService;
     
     
     @GetMapping("/listbydate/{date}")
-    public ResponseEntity<List<Fee>> listByDate(
+    public ResponseEntity<List<FeeRecords>> listByDate(
             @PathVariable
             @DateTimeFormat(pattern = "yyyy-MM-dd")
-            LocalDate date)
+            LocalDate date,@RequestAttribute("schoolId") Long schoolId)
     {
-    	List<Fee> list = feeService.listByDate(date);
+    	School school = schoolService.getSchoolById(schoolId);
+    	List<FeeRecords> list = feeService.listByDate(date,school).stream().map(new Function<Fee, FeeRecords>()
+    	{
+    		@Override
+    		public FeeRecords apply(Fee fee) {
+    			FeeRecords fr = new FeeRecords();
+    			fr.setAmount(fee.getAmount());
+    			fr.setClassSection(fee.getClassEntity().getClassName());
+    			fr.setMobileNumber(fee.getStudent().getMobileNumber());
+    			fr.setName(fee.getStudent().getName());
+    			fr.setPanNumber(fee.getStudent().getPanNumber());
+    			fr.setReceiptNumber(fee.getReceiptNumber());
+    			fr.setSession(fee.getSession().getName());
+    			return fr;
+    		}
+		}).collect(Collectors.toList());
     	return ResponseEntity.ok(list);
+    }
+    
+    static class FeeRecords
+    {
+    	private String panNumber;
+    	private String name;
+    	private String mobileNumber;
+    	private String session;
+    	private String classSection;
+    	private Double amount;
+    	private String receiptNumber;
+		public String getPanNumber() {
+			return panNumber;
+		}
+		public void setPanNumber(String panNumber) {
+			this.panNumber = panNumber;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getMobileNumber() {
+			return mobileNumber;
+		}
+		public void setMobileNumber(String mobileNumber) {
+			this.mobileNumber = mobileNumber;
+		}
+		public String getSession() {
+			return session;
+		}
+		public void setSession(String session) {
+			this.session = session;
+		}
+		public String getClassSection() {
+			return classSection;
+		}
+		public void setClassSection(String classSection) {
+			this.classSection = classSection;
+		}
+		public Double getAmount() {
+			return amount;
+		}
+		public void setAmount(Double amount) {
+			this.amount = amount;
+		}
+		public String getReceiptNumber() {
+			return receiptNumber;
+		}
+		public void setReceiptNumber(String receiptNumber) {
+			this.receiptNumber = receiptNumber;
+		}
     }
     
     @PutMapping(value = "/edit/{amt}/{receipt}")

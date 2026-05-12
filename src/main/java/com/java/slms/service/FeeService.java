@@ -3,6 +3,7 @@ package com.java.slms.service;
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
 import com.java.slms.model.Fee;
+import com.java.slms.model.School;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,5 +28,5 @@ public interface FeeService
 
 	void delete(String receiptNumber);
 
-	List<Fee> listByDate(LocalDate date);
+	List<Fee> listByDate(LocalDate date,School school);
 }

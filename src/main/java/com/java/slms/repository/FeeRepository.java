@@ -1,6 +1,7 @@
 package com.java.slms.repository;
 
 import com.java.slms.model.Fee;
+import com.java.slms.model.School;
 import com.java.slms.util.FeeMonth;
 import com.java.slms.util.FeeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -73,8 +74,9 @@ public interface FeeRepository extends JpaRepository<Fee, Long>
 
     Optional<Fee> findByReceiptNumber(String receiptNumber);
 
-    @Query("SELECT F FROM Fee F WHERE paymentDate = :date AND status = :status")
+    @Query("SELECT F FROM Fee F WHERE paymentDate = :date AND status = :status AND school = :school")
     List<Fee> findByDateAndStatus(
             @Param("date") LocalDate date,
-            @Param("status") FeeStatus status);
+            @Param("status") FeeStatus status,
+            @Param("school") School school);
 }

@@ -2,6 +2,7 @@ package com.java.slms.service;
 
 import com.java.slms.dto.SchoolRequestDto;
 import com.java.slms.dto.SchoolResponseDto;
+import com.java.slms.model.School;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface SchoolService
 	void deactiveSchool(Long id);
 
 	void activeSchool(Long id);
+
+	School getSchoolById(Long schoolId);
 }

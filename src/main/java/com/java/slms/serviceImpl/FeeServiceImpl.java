@@ -9,6 +9,7 @@ import com.java.slms.exception.WrongArgumentException;
 import com.java.slms.model.ClassEntity;
 import com.java.slms.model.Fee;
 import com.java.slms.model.FeeStructure;
+import com.java.slms.model.School;
 import com.java.slms.model.Session;
 import com.java.slms.model.Student;
 import com.java.slms.repository.FeeRepository;
@@ -385,8 +386,8 @@ public class FeeServiceImpl implements FeeService
 	}
 
 	@Override
-	public List<Fee> listByDate(LocalDate date) 
+	public List<Fee> listByDate(LocalDate date,School school) 
 	{
-		return feeRepository.findByDateAndStatus(date,FeeStatus.PAID);
+		return feeRepository.findByDateAndStatus(date,FeeStatus.PAID,school);
 	}
 }

@@ -37,6 +37,13 @@ public class SchoolServiceImpl implements SchoolService
                 .orElseThrow(() -> new ResourceNotFoundException("School not found"));
         return modelMapper.map(school, SchoolResponseDto.class);
     }
+    
+    public School getSchoolById(Long id)
+    {
+        School school = schoolRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("School not found"));
+        return school;
+    }
 
     @Override
     public List<SchoolResponseDto> getAllSchools(boolean status)

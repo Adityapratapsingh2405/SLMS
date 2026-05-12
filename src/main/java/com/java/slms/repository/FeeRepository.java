@@ -76,5 +76,5 @@ public interface FeeRepository extends JpaRepository<Fee, Long>
     @Query("SELECT F FROM Fee F WHERE paymentDate = :date AND status = :status")
     List<Fee> findByDateAndStatus(
             @Param("date") LocalDate date,
-            @Param("status") String status);
+            @Param("status") FeeStatus status);
 }

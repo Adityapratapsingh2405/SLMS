@@ -387,6 +387,6 @@ public class FeeServiceImpl implements FeeService
 	@Override
 	public List<Fee> listByDate(LocalDate date) 
 	{
-		return feeRepository.findByDateAndStatus(date,"PAID");
+		return feeRepository.findByDateAndStatus(date,FeeStatus.PAID);
 	}
 }

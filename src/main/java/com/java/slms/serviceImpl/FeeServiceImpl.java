@@ -78,6 +78,9 @@ public class FeeServiceImpl implements FeeService
         }
 
         // Validate payment amount matches the fee amount
+        if(!student.getTransport()) {
+        	fee.setAmount(fee.getAmount()-student.getCurrentClass().getFeeStructures().getTransportFees());
+        }
         if (Double.compare(fee.getAmount(), feeRequestDTO.getAmount()) != 0)
         {
             throw new WrongArgumentException("Payment amount " + feeRequestDTO.getAmount() + 
@@ -213,16 +216,28 @@ public class FeeServiceImpl implements FeeService
                 mFee.setStatus(fee.getStatus().name().toLowerCase());
                 mFee.setPaymentDate(fee.getPaymentDate());
                 mFee.setReceiptNumber(fee.getReceiptNumber());
-
-                monthlyFees.add(mFee);
-                totalAmount += fee.getAmount();
-
+                
+                if(student.getTransport() || fee.getStatus().equals(FeeStatus.PAID))
+                	totalAmount += fee.getAmount();
+                else                	
+                	totalAmount += fee.getAmount()-student.getCurrentClass().getFeeStructures().getTransportFees();                
+                
                 switch (fee.getStatus())
                 {
                     case PAID -> totalPaid += fee.getAmount();
-                    case PENDING -> totalPending += fee.getAmount();
+                    case PENDING -> totalPending += student.getTransport()?fee.getAmount():fee.getAmount()-student.getCurrentClass().getFeeStructures().getTransportFees();
                     case OVERDUE -> totalOverdue += fee.getAmount();
-                    case UNPAID -> totalPending += fee.getAmount();
+                    case UNPAID -> totalPending += student.getTransport()?fee.getAmount():fee.getAmount()-student.getCurrentClass().getFeeStructures().getTransportFees();
+                }
+
+                // ADjust Fee 
+                if(fee.getStatus().equals(FeeStatus.PAID))
+                	monthlyFees.add(mFee);
+                else {
+                	if(!student.getTransport()) {
+                		 mFee.setAmount(fee.getAmount()-student.getCurrentClass().getFeeStructures().getTransportFees());
+                	}
+                	monthlyFees.add(mFee);
                 }
             }
         }

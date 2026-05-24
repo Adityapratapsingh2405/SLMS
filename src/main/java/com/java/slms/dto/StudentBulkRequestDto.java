@@ -30,6 +30,7 @@ public class StudentBulkRequestDto
     private String mobile;
     private String dob;
     private String address;
+    private String transport;
     private Long userId;
    
 }

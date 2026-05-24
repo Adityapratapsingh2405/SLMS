@@ -19,4 +19,8 @@ public class ClassInfoResponse
     private int totalStudents;
     private Double feeCollectionRate;
     private List<StudentResponseDto> students;
+    private Double transportFees;
+    private Double computerFees;
+    private Double tuitionFees;
+    private Double otherFees;
 }

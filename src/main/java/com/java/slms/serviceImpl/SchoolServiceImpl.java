@@ -26,6 +26,7 @@ public class SchoolServiceImpl implements SchoolService
     public SchoolResponseDto createSchool(SchoolRequestDto dto)
     {
         School school = modelMapper.map(dto, School.class);
+        school.setStatus(true);
         School saved = schoolRepository.save(school);
         return modelMapper.map(saved, SchoolResponseDto.class);
     }

@@ -4,11 +4,13 @@ import com.java.slms.util.Gender;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@ToString
 public class UpdateStudentInfo
 {
     private String name;
@@ -23,4 +25,5 @@ public class UpdateStudentInfo
     private String previousSchool;
     private String className; // Format: "1-A", "10-B", etc.
     private Long classId; // Direct class ID if provided
+    private Boolean transport;
 }

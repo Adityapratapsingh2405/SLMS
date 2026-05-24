@@ -105,6 +105,7 @@ public class StudentServiceImpl implements StudentService {
 					student.setPanNumber(req.getPanNumber());
 					student.setAddress(req.getAddress());
 					student.setDateOfBirth(dob);
+					student.setTransport(req.getTransport().equalsIgnoreCase("yes"));
 					
 					Student savedStudent = studentRepository.save(student);
 					
@@ -201,6 +202,7 @@ public class StudentServiceImpl implements StudentService {
 		student.setUser(user);
 		student.setSchool(school);
 		student.setSession(session);
+		student.setTransport(studentRequestDto.getTransport());
 
 		// Explicitly set admission date if provided
 		if (studentRequestDto.getAdmissionDate() != null) {
@@ -383,6 +385,7 @@ public class StudentServiceImpl implements StudentService {
 		// Map basic fields
 		modelMapper.map(updateStudentInfo, fetchedStudent);
 		fetchedStudent.setPanNumber(pan);
+		fetchedStudent.setTransport(updateStudentInfo.getTransport());
 
 		// Handle class update - prioritize classId over className
 		boolean classWillChange = false;
@@ -722,7 +725,7 @@ public class StudentServiceImpl implements StudentService {
 		dto.setClassId(student.getCurrentClass().getId());
 		dto.setSessionId(student.getSession().getId());
 		dto.setSessionName(student.getSession().getName());
-
+		dto.setTransport(student.getTransport());
 		// Set school information
 		School school = student.getSchool();
 		if (school != null) {

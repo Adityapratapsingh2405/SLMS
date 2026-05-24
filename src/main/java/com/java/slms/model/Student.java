@@ -92,5 +92,7 @@ public class Student extends BaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
     private School school;
+    
+    private Boolean transport;
 
 }

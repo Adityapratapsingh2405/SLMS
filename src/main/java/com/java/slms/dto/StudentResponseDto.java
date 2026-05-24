@@ -58,4 +58,5 @@ public class StudentResponseDto
     private Date createdAt;
     private Date updatedAt;
     private Date deletedAt;
+    private Boolean transport;
 }

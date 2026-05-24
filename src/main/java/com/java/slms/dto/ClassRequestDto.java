@@ -14,4 +14,9 @@ public class ClassRequestDto
     private Long schoolId;
     private Long classTeacherId;
     private Long sessionId;
+    
+    private Double transportFees;
+    private Double computerFees;
+    private Double tuitionFees;
+    private Double otherFees;
 }

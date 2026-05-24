@@ -91,7 +91,14 @@ public class ClassEntityServiceImpl implements ClassEntityService
         System.out.println("Before Fees Structure");
         
         // Save fee structure
-        FeeStructure feeStructure = FeeStructure.builder().feesAmount(classRequestDto.getFeesAmount()).session(session).classEntity(savedEntity).school(school).build();
+        FeeStructure feeStructure = FeeStructure.builder().feesAmount(classRequestDto.getFeesAmount())
+        												.transportFees(classRequestDto.getTransportFees())
+        												.computerFees(classRequestDto.getComputerFees())
+        												.tuitionFees(classRequestDto.getTuitionFees())
+        												.otherFees(classRequestDto.getOtherFees())
+        												.session(session)
+        												.classEntity(savedEntity)
+        												.school(school).build();
 
         feeStructureRepository.save(feeStructure);
         
@@ -144,6 +151,12 @@ public class ClassEntityServiceImpl implements ClassEntityService
             }
 
             dto.setFeesAmount(feeStructure.getFeesAmount());
+            dto.setTransportFees(feeStructure.getTransportFees());
+            dto.setComputerFees(feeStructure.getComputerFees());
+            dto.setTuitionFees(feeStructure.getTuitionFees());
+            dto.setOtherFees(feeStructure.getOtherFees());
+            
+            
             dto.setTotalStudents(classEntity.getStudents() != null ? classEntity.getStudents().size() : 0);
 
             List<StudentResponseDto> students = studentService.getStudentsByClassId(classId, schoolId);
@@ -272,6 +285,12 @@ public class ClassEntityServiceImpl implements ClassEntityService
         FeeStructure feeStructure = feeStructureRepository.findByClassEntity_IdAndSession_IdAndSchool_Id(id, session.getId(), schoolId).orElseThrow(() -> new ResourceNotFoundException("Fee structure not found for class and session"));
 
         feeStructure.setFeesAmount(classRequestDto.getFeesAmount());
+        
+        feeStructure.setTransportFees(classRequestDto.getTransportFees());
+        feeStructure.setComputerFees(classRequestDto.getComputerFees());
+        feeStructure.setTuitionFees(classRequestDto.getTuitionFees());
+        feeStructure.setOtherFees(classRequestDto.getOtherFees());
+        
         feeStructure.setSession(session);
         feeStructure.setClassEntity(existingClass);
         feeStructureRepository.save(feeStructure);

@@ -29,6 +29,12 @@ public class FeeStructure extends BaseEntity
     @EqualsAndHashCode.Include
     private Long id;
 
+    
+    private Double transportFees;
+    private Double computerFees;
+    private Double tuitionFees;
+    private Double otherFees;
+    
     private Double feesAmount;
 
     @OneToOne(fetch = FetchType.LAZY)

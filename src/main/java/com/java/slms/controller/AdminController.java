@@ -2,10 +2,12 @@ package com.java.slms.controller;
 
 import com.java.slms.dto.TransportDto;
 import com.java.slms.dto.UserRequest;
+import com.java.slms.model.EventMessage;
 import com.java.slms.model.Transport;
 import com.java.slms.payload.RestResponse;
 import com.java.slms.service.AdminService;
 import com.java.slms.service.TransportService;
+import com.java.slms.serviceImpl.MessageService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,6 +41,16 @@ public class AdminController
     
     @Autowired
 	private TransportService transService;
+    @Autowired
+    private MessageService msgService;
+    
+    @PostMapping(value = "/sendEventMsg")
+    public ResponseEntity sendEventMsg(@RequestBody EventMessage eventModel,
+    		@RequestAttribute("schoolId") Long schoolId) 
+    {
+    	msgService.sendEventMessage(eventModel,schoolId);
+    	return ResponseEntity.ok("Message Send");
+    }
 	
 	@PostMapping(value = "/transsave", consumes = "application/json")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")

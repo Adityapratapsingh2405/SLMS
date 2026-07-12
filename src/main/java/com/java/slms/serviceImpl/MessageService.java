@@ -46,11 +46,17 @@ public class MessageService
 		School school = schoolRepository.findById(schoolId)
                 .orElseThrow(() -> new ResourceNotFoundException("School not found"));
 		
-		String msg = EVENT_TEMPLATE.replaceAll("{#event#}", data.getTitle());
-		msg = msg.replaceAll("{#date#}", data.getDate());
-		msg = msg.replaceAll("{#time#}", data.getTime());
-		msg = msg.replaceAll("{#venue#}", data.getVenue());
-		msg = msg.replaceAll("{#school#}", school.getSchoolName());
+//		String msg = EVENT_TEMPLATE.replace("{#event#}", data.getTitle());
+//		msg = msg.replace("{#date#}", data.getDate());
+//		msg = msg.replace("{#time#}", data.getTime());
+//		msg = msg.replace("{#venue#}", data.getVenue());
+//		msg = msg.replace("{#school#}", school.getSchoolName());
+		String msg = EVENT_TEMPLATE
+		        .replace("{#event#}", data.getTitle())
+		        .replace("{#date#}", data.getDate())
+		        .replace("{#time#}", data.getTime())
+		        .replace("{#venue#}", data.getVenue())
+		        .replace("{#school#}", school.getSchoolName());
 		msg = URLEncoder.encode(msg,StandardCharsets.UTF_8);
 		
 		for(String pan : data.getStudents())

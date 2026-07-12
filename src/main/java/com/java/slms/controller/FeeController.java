@@ -216,9 +216,10 @@ public class FeeController
                     @ApiResponse(responseCode = "400", description = "Invalid PEN or student not found", content = @Content)
             }
     )
-    @GetMapping("/catalogs/{panNumber}")
-    public ResponseEntity<RestResponse<FeeCatalogDto>> getFeeCatalogByStudentPan(@PathVariable String panNumber,
-                                                                                 @RequestAttribute("schoolId") Long schoolId)
+    @GetMapping("/catalogsviapan")
+    public ResponseEntity<RestResponse<FeeCatalogDto>> 
+    			getFeeCatalogByStudentPan(@RequestParam(value = "pan") String panNumber,
+    					@RequestAttribute("schoolId") Long schoolId)
     {
         FeeCatalogDto catalog = feeService.getFeeCatalogByStudentPanNumber(panNumber, schoolId);
 

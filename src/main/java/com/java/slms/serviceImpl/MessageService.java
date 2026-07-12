@@ -37,7 +37,7 @@ public class MessageService
 	private final String API_KEY = "Dmh0xYeIZU2aq0NDR5HpUw";
 	private final String SMS_SERVER = "https://www.smsgatewayhub.com/api/mt/SendSMS";
 	
-	private final String EVENT_TEMPLATE = "	Dear Parents & Students, This is to inform you that our school is organizing "
+	private final String EVENT_TEMPLATE = "Dear Parents & Students, This is to inform you that our school is organizing "
 			+ "a {#event#} on {#date#} at {#time#}. Venue: {#venue#} Students are requested to participate enthusiastically and "
 			+ "report on time in proper school uniform. For any queries, please contact the school office. Regards, {#school#} NEXTEG";
 	
@@ -57,6 +57,7 @@ public class MessageService
 		        .replace("{#time#}", data.getTime())
 		        .replace("{#venue#}", data.getVenue())
 		        .replace("{#school#}", school.getSchoolName());
+		System.out.println(msg);
 		msg = URLEncoder.encode(msg,StandardCharsets.UTF_8);
 		
 		for(String pan : data.getStudents())

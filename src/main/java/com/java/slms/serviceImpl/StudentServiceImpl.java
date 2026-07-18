@@ -236,7 +236,8 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException(
 						"Fee structure not found for class " + classEntity.getClassName() + " and session "
 								+ session.getName() + " in school ID: " + schoolId));
-
+		log.info("Fee Structur : " + feeStructure);
+		
 		List<Fee> feeEntries = new ArrayList<>();
 		LocalDate currentMonth = session.getStartDate().withDayOfMonth(1);
 
@@ -273,6 +274,7 @@ public class StudentServiceImpl implements StudentService {
 		fee.setSession(session); // Link fee to session
 		feeEntries.add(fee);
 
+		log.info("FeeEntries : " + feeEntries.size());		
 		feeRepository.saveAll(feeEntries);
 		log.info("Successfully generated {} fee records for student: {}", feeEntries.size(),
 				savedStudent.getPanNumber());

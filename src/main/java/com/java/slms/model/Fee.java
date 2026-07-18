@@ -19,7 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = {"student_pan", "fee_structure_id", "month", "year"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"student_pan", "fee_structure_id", "month", "year","type"})
 )
 public class Fee extends BaseEntity
 {

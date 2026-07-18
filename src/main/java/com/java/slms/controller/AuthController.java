@@ -199,9 +199,14 @@ public class AuthController {
 			req.setUserId(user.getId());
 		}
 
-		return ResponseEntity
-				.ok(RestResponse.<StudentResponseDto>builder().data(studentService.createStudent(req, schoolId))
-						.message("Student registered successfully").status(HttpStatus.OK.value()).build());
+		try {
+			return ResponseEntity
+					.ok(RestResponse.<StudentResponseDto>builder().data(studentService.createStudent(req, schoolId))
+							.message("Student registered successfully").status(HttpStatus.OK.value()).build());
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")

@@ -1,5 +1,6 @@
 package com.java.slms.serviceImpl;
 
+import com.java.slms.dto.EditFeesRequestDTO;
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
 import com.java.slms.dto.MonthlyFeeDto;
@@ -57,9 +58,17 @@ public class FeeServiceImpl implements FeeService
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found with ID: " + 
                         feeRequestDTO.getSessionId() + " for schoolId: " + schoolId));
 
-        List<Fee> fees = feeRepository.findFeesByPanNumberAndSchoolIdAndMonth(
-                feeRequestDTO.getStudentPanNumber(), schoolId, feeRequestDTO.getMonth(), session.getId()
-        );
+        List<Fee> fees = null;
+        if(feeRequestDTO.getType().equals("exam")) {
+        	 fees = feeRepository.findFeesByPanNumberAndSchoolIdAndType(
+                     feeRequestDTO.getStudentPanNumber(), schoolId, "exam", session.getId()
+             );
+        }else {
+        	 fees = feeRepository.findFeesByPanNumberAndSchoolIdAndMonth(
+                     feeRequestDTO.getStudentPanNumber(), schoolId, feeRequestDTO.getMonth(), "exam",session.getId()
+             );
+        }
+        
 
         if (fees.isEmpty())
         {
@@ -183,10 +192,10 @@ public class FeeServiceImpl implements FeeService
         {
             feeRepository.saveAll(fees);
         }
+        //System.out.println("Fees Count : " + fees.size());
+        Map<FeeMonth, Fee> feeMap = fees.stream().collect(Collectors.toMap(Fee::getMonth, Function.identity(), (existing, replacement) -> existing));
 
-        Map<FeeMonth, Fee> feeMap = fees.stream()
-                .collect(Collectors.toMap(Fee::getMonth, Function.identity(), (existing, replacement) -> existing));
-
+        //System.out.println("Map : " + feeMap.size());
         FeeCatalogDto catalog = new FeeCatalogDto();
         catalog.setStudentId(student.getPanNumber());
 
@@ -216,6 +225,7 @@ public class FeeServiceImpl implements FeeService
                 mFee.setStatus(fee.getStatus().name().toLowerCase());
                 mFee.setPaymentDate(fee.getPaymentDate());
                 mFee.setReceiptNumber(fee.getReceiptNumber());
+                mFee.setType(fee.getType());
                 
                 if(student.getTransport() || fee.getStatus().equals(FeeStatus.PAID))
                 	totalAmount += fee.getAmount();
@@ -241,7 +251,30 @@ public class FeeServiceImpl implements FeeService
                 }
             }
         }
-
+        
+        // Add Exam Fees
+        Fee examFee = fees.stream().filter(f->f.getType().equals("exam"))
+        						.collect(Collectors.toList()).get(0); 
+        MonthlyFeeDto mFee = new MonthlyFeeDto();
+        mFee.setMonth(FeeMonth.JANUARY.name());
+        mFee.setYear(examFee.getYear());
+        mFee.setAmount(examFee.getAmount());
+        mFee.setDueDate(examFee.getDueDate());
+        mFee.setStatus(examFee.getStatus().name().toLowerCase());
+        mFee.setPaymentDate(examFee.getPaymentDate());
+        mFee.setReceiptNumber(examFee.getReceiptNumber());
+        mFee.setType(examFee.getType());
+        monthlyFees.add(0, mFee);
+        switch (examFee.getStatus())
+        {
+            case PAID -> totalPaid += examFee.getAmount();
+            case PENDING -> totalPending += examFee.getAmount();
+            case OVERDUE -> totalOverdue += examFee.getAmount();
+            case UNPAID -> totalPending += examFee.getAmount();
+        }
+        totalAmount+=examFee.getAmount();
+        
+        
         catalog.setMonthlyFees(monthlyFees);
         catalog.setTotalAmount(totalAmount);
         catalog.setTotalPaid(totalPaid);
@@ -362,29 +395,42 @@ public class FeeServiceImpl implements FeeService
     }
 
 	@Override
-	public void edit(String receiptNumber, Float amount) {
+	public void edit(String receiptNumber, Float amount) throws Exception {
 		
 		Optional<Fee> feeOp = feeRepository.findByReceiptNumber(receiptNumber);
 		if(feeOp.isPresent()) 
 		{
 			Fee fee = feeOp.get();
 			
-			ClassEntity ce = fee.getClassEntity();
-			double monthfee = ce.getFeeStructures().getFeesAmount();
-			double payfee = (double)amount;
+			FeeMonth fm = fee.getMonth();
+			
 						
+			//ClassEntity ce = fee.getClassEntity();
+			//double monthfee = ce.getFeeStructures().getFeesAmount();
+			double monthfee = fee.getAmount();
+			double payfee = (double)amount;
 			
-			if(payfee < monthfee) {
-				fee.setAmount(payfee);
-				fee.setStatus(FeeStatus.PENDING);
-			}				
-			else
-			{
-				fee.setAmount(monthfee);
-				fee.setStatus(FeeStatus.PAID);
-			}
+			FeeMonth nextMonth = fm.next();
+			if(nextMonth==null)
+				throw new Exception("Already a last Month");
+			else {
+				Optional<Fee> nextOp = feeRepository.findByStudentAndMonth(fee.getStudent(), nextMonth);
+				Fee nextFee = nextOp.get();
+				
+				if(payfee < monthfee) {
+					fee.setAmount(payfee);
+					nextFee.setAmount(nextFee.getAmount()+(monthfee-payfee));
+				}				
+				else
+				{
+					fee.setAmount(payfee);
+					nextFee.setAmount(nextFee.getAmount()-(payfee-monthfee));
+				}
+				
+				feeRepository.save(fee);
+				feeRepository.save(nextFee);
+			}	
 			
-			feeRepository.save(fee);
 		}
 	}
 
@@ -404,5 +450,29 @@ public class FeeServiceImpl implements FeeService
 	public List<Fee> listByDate(LocalDate date,School school) 
 	{
 		return feeRepository.findByDateAndStatus(date,FeeStatus.PAID,school);
+	}
+	
+	@Override
+	public void editFeesStructure(EditFeesRequestDTO dto, Long schoolId, String pan) {
+		 Student student = studentRepository.findByPanNumberIgnoreCaseAndSchool_Id(pan, schoolId)
+	                .orElseThrow(() -> new ResourceNotFoundException("Student not found with PEN: " + pan));
+		 Session studentSession = student.getSession();
+	        if (studentSession == null) {
+	            throw new ResourceNotFoundException("Student " + student.getPanNumber() + 
+	                    " is not enrolled in any session");
+	        }
+	        
+	     List<Fee> fees = feeRepository.findByStudentPanNumberAndSchoolIdOrderByYearAscMonthAsc(
+	                student.getPanNumber(), schoolId, studentSession.getId());
+		
+	     Double feesAmount = dto.getTrans()+dto.getComp()+dto.getTuit()+dto.getOther();
+	     fees.forEach(fee->{
+	    	 if(fee.getType().equals("exam"))
+	    		 fee.setAmount(dto.getExam());
+	    	 else
+	    		 fee.setAmount(feesAmount);
+	    	 
+	    	 feeRepository.save(fee);
+	     });
 	}
 }

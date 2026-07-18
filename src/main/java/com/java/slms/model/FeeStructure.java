@@ -36,6 +36,7 @@ public class FeeStructure extends BaseEntity
     private Double otherFees;
     
     private Double feesAmount;
+    private Double examAmount;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_id", nullable = false)

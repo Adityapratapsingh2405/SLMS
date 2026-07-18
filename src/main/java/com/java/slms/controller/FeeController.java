@@ -1,5 +1,6 @@
 package com.java.slms.controller;
 
+import com.java.slms.dto.EditFeesRequestDTO;
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
 import com.java.slms.model.ClassEntity;
@@ -123,8 +124,13 @@ public class FeeController
     @PutMapping(value = "/edit/{amt}/{receipt}")
     public String editFees(@PathVariable(value = "amt") Float amount , @PathVariable(value = "receipt") String receiptNumber) 
     {
-    	feeService.edit(receiptNumber,amount);
-    	return "success";
+    	try {
+			feeService.edit(receiptNumber,amount);
+			return "success";
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+    	
     }
     @DeleteMapping(value = "/delete/{receipt}")
     public String delFees(@PathVariable(value = "receipt") String receiptNumber) 
@@ -151,6 +157,23 @@ public class FeeController
     {
 
         feeService.payFeesOfStudent(requestDto, schoolId);
+
+        return ResponseEntity.ok(
+                RestResponse.builder()
+                        .data(null)
+                        .message("Fees updated successfully.")
+                        .status(HttpStatus.OK.value())
+                        .build()
+        );
+    }
+    
+    @PutMapping("/editfees/{pan}")
+    public ResponseEntity<RestResponse<?>> editFees(@RequestBody EditFeesRequestDTO requestDto,
+                                                   @RequestAttribute("schoolId") Long schoolId,
+                                                   @PathVariable(value = "pan") String pan)
+    {
+
+        feeService.editFeesStructure(requestDto, schoolId,pan);
 
         return ResponseEntity.ok(
                 RestResponse.builder()

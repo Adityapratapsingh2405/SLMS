@@ -2,6 +2,7 @@ package com.java.slms.repository;
 
 import com.java.slms.model.Fee;
 import com.java.slms.model.School;
+import com.java.slms.model.Student;
 import com.java.slms.util.FeeMonth;
 import com.java.slms.util.FeeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,11 +16,19 @@ import java.util.Optional;
 
 public interface FeeRepository extends JpaRepository<Fee, Long>
 {
-    @Query("SELECT f FROM Fee f WHERE LOWER(f.student.panNumber) = LOWER(:panNumber) AND f.student.school.id = :schoolId AND f.month = :month AND f.session.id = :sessionId")
+    @Query("SELECT f FROM Fee f WHERE LOWER(f.student.panNumber) = LOWER(:panNumber) AND f.student.school.id = :schoolId AND f.month = :month AND f.type != :type AND f.session.id = :sessionId")
     List<Fee> findFeesByPanNumberAndSchoolIdAndMonth(@Param("panNumber") String panNumber,
                                                      @Param("schoolId") Long schoolId,
                                                      @Param("month") FeeMonth month,
+                                                     @Param("type") String type,
                                                      @Param("sessionId") Long sessionId);
+    
+    @Query("SELECT f FROM Fee f WHERE LOWER(f.student.panNumber) = LOWER(:panNumber) AND f.student.school.id = :schoolId AND f.type = :type AND f.session.id = :sessionId")
+    List<Fee> findFeesByPanNumberAndSchoolIdAndType(@Param("panNumber") String panNumber,
+                                                     @Param("schoolId") Long schoolId,
+                                                     @Param("type") String type,
+                                                     @Param("sessionId") Long sessionId);
+    
 
     @Query("SELECT f FROM Fee f " +
             "WHERE f.student.panNumber = :panNumber " +
@@ -79,4 +88,6 @@ public interface FeeRepository extends JpaRepository<Fee, Long>
             @Param("date") LocalDate date,
             @Param("status") FeeStatus status,
             @Param("school") School school);
+    
+    Optional<Fee> findByStudentAndMonth(Student student,FeeMonth month);
 }

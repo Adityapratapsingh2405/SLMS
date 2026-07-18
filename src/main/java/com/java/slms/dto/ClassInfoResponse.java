@@ -23,4 +23,5 @@ public class ClassInfoResponse
     private Double computerFees;
     private Double tuitionFees;
     private Double otherFees;
+    private Double examAmount;
 }

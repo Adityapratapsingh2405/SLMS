@@ -15,4 +15,5 @@ public class FeeRequestDTO
     private Long sessionId;
     private Long classId;
     private String receiptNumber;
+    private String type;
 }

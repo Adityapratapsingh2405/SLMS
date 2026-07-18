@@ -17,4 +17,5 @@ public class MonthlyFeeDto
     private String status;
     private LocalDate paymentDate;
     private String receiptNumber;
+    private String type;
 }

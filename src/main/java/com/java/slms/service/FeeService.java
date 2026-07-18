@@ -1,5 +1,6 @@
 package com.java.slms.service;
 
+import com.java.slms.dto.EditFeesRequestDTO;
 import com.java.slms.dto.FeeCatalogDto;
 import com.java.slms.dto.FeeRequestDTO;
 import com.java.slms.model.Fee;
@@ -24,9 +25,11 @@ public interface FeeService
     @Transactional
     void markPendingFeesAsOverdue(Long schoolid);
 
-	void edit(String receiptNumber, Float amount);
+	void edit(String receiptNumber, Float amount) throws Exception;
 
 	void delete(String receiptNumber);
 
 	List<Fee> listByDate(LocalDate date,School school);
+
+	void editFeesStructure(EditFeesRequestDTO requestDto, Long schoolId, String pan);
 }

@@ -136,7 +136,20 @@ public class StudentServiceImpl implements StudentService {
 						feeEntries.add(fee);
 						currentMonth = currentMonth.plusMonths(1);
 					}
-
+					// For Exam Fees
+					Fee fee = new Fee();
+					fee.setType("exam");
+					fee.setMonth(FeeMonth.JANUARY);
+					fee.setYear(currentMonth.getYear());
+					fee.setStatus(FeeStatus.PENDING);
+					fee.setAmount(feeStructure.getExamAmount());
+					fee.setFeeStructure(feeStructure);
+					fee.setClassEntity(classEntity);
+					fee.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+					fee.setStudent(savedStudent);
+					fee.setSchool(school);
+					fee.setSession(session); // Link fee to session
+					feeEntries.add(fee);
 					feeRepository.saveAll(feeEntries);
 					
 					
@@ -229,6 +242,7 @@ public class StudentServiceImpl implements StudentService {
 
 		for (int i = 0; i < 12; i++) {
 			Fee fee = new Fee();
+			fee.setType("monthly");
 			fee.setMonth(FeeMonth.valueOf(currentMonth.getMonth().toString()));
 			fee.setYear(currentMonth.getYear());
 			fee.setStatus(FeeStatus.PENDING);
@@ -243,6 +257,21 @@ public class StudentServiceImpl implements StudentService {
 			feeEntries.add(fee);
 			currentMonth = currentMonth.plusMonths(1);
 		}
+		
+		// For Exam Fees
+		Fee fee = new Fee();
+		fee.setType("exam");
+		fee.setMonth(FeeMonth.JANUARY);
+		fee.setYear(currentMonth.getYear());
+		fee.setStatus(FeeStatus.PENDING);
+		fee.setAmount(feeStructure.getExamAmount());
+		fee.setFeeStructure(feeStructure);
+		fee.setClassEntity(classEntity);
+		fee.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+		fee.setStudent(savedStudent);
+		fee.setSchool(school);
+		fee.setSession(session); // Link fee to session
+		feeEntries.add(fee);
 
 		feeRepository.saveAll(feeEntries);
 		log.info("Successfully generated {} fee records for student: {}", feeEntries.size(),

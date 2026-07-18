@@ -96,6 +96,7 @@ public class ClassEntityServiceImpl implements ClassEntityService
         												.computerFees(classRequestDto.getComputerFees())
         												.tuitionFees(classRequestDto.getTuitionFees())
         												.otherFees(classRequestDto.getOtherFees())
+        												.examAmount(classRequestDto.getExamAmount())
         												.session(session)
         												.classEntity(savedEntity)
         												.school(school).build();
@@ -155,7 +156,7 @@ public class ClassEntityServiceImpl implements ClassEntityService
             dto.setComputerFees(feeStructure.getComputerFees());
             dto.setTuitionFees(feeStructure.getTuitionFees());
             dto.setOtherFees(feeStructure.getOtherFees());
-            
+            dto.setExamAmount(feeStructure.getExamAmount());
             
             dto.setTotalStudents(classEntity.getStudents() != null ? classEntity.getStudents().size() : 0);
 
@@ -290,6 +291,7 @@ public class ClassEntityServiceImpl implements ClassEntityService
         feeStructure.setComputerFees(classRequestDto.getComputerFees());
         feeStructure.setTuitionFees(classRequestDto.getTuitionFees());
         feeStructure.setOtherFees(classRequestDto.getOtherFees());
+        feeStructure.setExamAmount(classRequestDto.getExamAmount());
         
         feeStructure.setSession(session);
         feeStructure.setClassEntity(existingClass);

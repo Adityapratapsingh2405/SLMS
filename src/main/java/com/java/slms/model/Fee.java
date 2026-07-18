@@ -40,6 +40,8 @@ public class Fee extends BaseEntity
     private LocalDate paymentDate;
 
     private String receiptNumber;
+    
+    private String type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

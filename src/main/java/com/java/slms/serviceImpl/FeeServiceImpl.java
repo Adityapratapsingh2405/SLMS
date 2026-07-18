@@ -253,26 +253,33 @@ public class FeeServiceImpl implements FeeService
         }
         
         // Add Exam Fees
-        Fee examFee = fees.stream().filter(f->f.getType().equals("exam"))
-        						.collect(Collectors.toList()).get(0); 
-        MonthlyFeeDto mFee = new MonthlyFeeDto();
-        mFee.setMonth(FeeMonth.JANUARY.name());
-        mFee.setYear(examFee.getYear());
-        mFee.setAmount(examFee.getAmount());
-        mFee.setDueDate(examFee.getDueDate());
-        mFee.setStatus(examFee.getStatus().name().toLowerCase());
-        mFee.setPaymentDate(examFee.getPaymentDate());
-        mFee.setReceiptNumber(examFee.getReceiptNumber());
-        mFee.setType(examFee.getType());
-        monthlyFees.add(0, mFee);
-        switch (examFee.getStatus())
+        List<Fee> examFees = fees.stream().filter(f->f.getType().equals("exam"))
+        						.collect(Collectors.toList());
+        if(examFees.size()>0)
         {
-            case PAID -> totalPaid += examFee.getAmount();
-            case PENDING -> totalPending += examFee.getAmount();
-            case OVERDUE -> totalOverdue += examFee.getAmount();
-            case UNPAID -> totalPending += examFee.getAmount();
+        	Fee examFee = examFees.get(0); 
+	        MonthlyFeeDto mFee = new MonthlyFeeDto();
+	        mFee.setMonth(FeeMonth.JANUARY.name());
+	        mFee.setYear(examFee.getYear());
+	        mFee.setAmount(examFee.getAmount());
+	        mFee.setDueDate(examFee.getDueDate());
+	        mFee.setStatus(examFee.getStatus().name().toLowerCase());
+	        mFee.setPaymentDate(examFee.getPaymentDate());
+	        mFee.setReceiptNumber(examFee.getReceiptNumber());
+	        mFee.setType(examFee.getType());
+	        monthlyFees.add(0, mFee);
+	        
+	        switch (examFee.getStatus())
+	        {
+	            case PAID -> totalPaid += examFee.getAmount();
+	            case PENDING -> totalPending += examFee.getAmount();
+	            case OVERDUE -> totalOverdue += examFee.getAmount();
+	            case UNPAID -> totalPending += examFee.getAmount();
+	        }
+	        totalAmount+=examFee.getAmount();
         }
-        totalAmount+=examFee.getAmount();
+        
+        
         
         
         catalog.setMonthlyFees(monthlyFees);

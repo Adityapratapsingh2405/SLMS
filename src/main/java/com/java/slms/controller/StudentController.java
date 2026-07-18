@@ -43,12 +43,13 @@ public class StudentController
     public ResponseEntity<RestResponse<List<StudentResponseDto>>> getAllStudents(@RequestAttribute("schoolId") Long schoolId)
     {
         List<StudentResponseDto> students = studentService.getAllStudent(schoolId);
+        System.out.println("students : " + students);
         RestResponse<List<StudentResponseDto>> response = RestResponse.<List<StudentResponseDto>>builder()
                 .data(students)
                 .message("Total Students - " + students.size())
                 .status(HttpStatus.OK.value())
                 .build();
-
+        System.out.println(response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

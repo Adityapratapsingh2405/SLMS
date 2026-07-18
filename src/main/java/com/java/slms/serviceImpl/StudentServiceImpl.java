@@ -347,11 +347,16 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public List<StudentResponseDto> getAllStudent(Long schoolId) {
 		log.info("Fetching all students");
-		return studentRepository.findAllBySchoolId(schoolId).stream().map(student -> {
-			StudentResponseDto dto = convertToDto(student);
-			setFeeStatuses(dto, student.getPanNumber(), schoolId);
-			return dto;
-		}).collect(Collectors.toList());
+		try {
+			return studentRepository.findAllBySchoolId(schoolId).stream().map(student -> {
+				StudentResponseDto dto = convertToDto(student);
+				setFeeStatuses(dto, student.getPanNumber(), schoolId);
+				return dto;
+			}).collect(Collectors.toList());
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override

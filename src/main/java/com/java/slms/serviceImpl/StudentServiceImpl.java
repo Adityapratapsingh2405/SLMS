@@ -44,6 +44,7 @@ public class StudentServiceImpl implements StudentService {
 	private final AttendanceRepository attendanceRepository;
 
 	@Override
+	@Transactional
 	public String createBulkStudent(StudentBulkRequestDto req, Long schoolId) {
 		try {
 			Optional<Session> opSess = sessionRepository.findByName(req.getSessionName());
@@ -64,50 +65,52 @@ public class StudentServiceImpl implements StudentService {
 					Optional<Student> existingStudent = studentRepository.findByPanNumberIgnoreCaseAndSchoolIdAndSessionId(
 							req.getPanNumber(), schoolId, session.getId());
 
+					Student savedStudent = null;
 					if (existingStudent.isPresent()) {
-						throw new AlreadyExistException("A student with PEN number '" + req.getPanNumber()
-								+ "' already exists in this school for the current session.");
+						savedStudent = existingStudent.get();
+					}else {
+						// Check duplicate class for same name and session
+						Optional<ClassEntity> duplicateClass = classEntityRepository.findByClassNameIgnoreCaseAndSessionIdAndSchoolId(
+								classEntity.getClassName(), session.getId(), schoolId);
+
+						if (duplicateClass.isPresent() && !duplicateClass.get().getId().equals(classEntity.getId())) {
+							throw new AlreadyExistException(
+									"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
+						}
+						
+//						 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+//					     LocalDate dob = LocalDate.parse(req.getDob(), formatter);
+						DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+						        .appendPattern("dd/MM/")
+						        .appendValueReduced(ChronoField.YEAR, 2, 4, 2000) 
+						        .toFormatter();
+
+						LocalDate dob = LocalDate.parse(req.getDob(), formatter);
+						
+						Optional<Student> opStud = studentRepository.findByPanNumberIgnoreCase(req.getPanNumber());
+						if(opStud.isPresent())
+							return "Already Exist";
+				
+						Student student = new Student();
+						student.setGender(Gender.valueOf(req.getGender().toUpperCase()));
+						student.setMobileNumber(req.getMobile());
+						student.setName(req.getName());
+						student.setParentName(req.getFatherName());
+						student.setStatus(UserStatus.ACTIVE);
+						student.setClassRollNumber(getNextRollNumber(classEntity.getId(), schoolId));
+						student.setCurrentClass(classEntity);
+						student.setUser(user);
+						student.setSchool(school);
+						student.setSession(session);
+						student.setPanNumber(req.getPanNumber());
+						student.setAddress(req.getAddress());
+						student.setDateOfBirth(dob);
+						student.setTransport(req.getTransport().equalsIgnoreCase("yes"));
+						
+						savedStudent = studentRepository.save(student);
 					}
 					
-					// Check duplicate class for same name and session
-					Optional<ClassEntity> duplicateClass = classEntityRepository.findByClassNameIgnoreCaseAndSessionIdAndSchoolId(
-							classEntity.getClassName(), session.getId(), schoolId);
-
-					if (duplicateClass.isPresent() && !duplicateClass.get().getId().equals(classEntity.getId())) {
-						throw new AlreadyExistException(
-								"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
-					}
-					
-//					 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
-//				     LocalDate dob = LocalDate.parse(req.getDob(), formatter);
-					DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-					        .appendPattern("dd/MM/")
-					        .appendValueReduced(ChronoField.YEAR, 2, 4, 2000) 
-					        .toFormatter();
-
-					LocalDate dob = LocalDate.parse(req.getDob(), formatter);
-					
-					Optional<Student> opStud = studentRepository.findByPanNumberIgnoreCase(req.getPanNumber());
-					if(opStud.isPresent())
-						return "Already Exist";
-			
-					Student student = new Student();
-					student.setGender(Gender.valueOf(req.getGender().toUpperCase()));
-					student.setMobileNumber(req.getMobile());
-					student.setName(req.getName());
-					student.setParentName(req.getFatherName());
-					student.setStatus(UserStatus.ACTIVE);
-					student.setClassRollNumber(getNextRollNumber(classEntity.getId(), schoolId));
-					student.setCurrentClass(classEntity);
-					student.setUser(user);
-					student.setSchool(school);
-					student.setSession(session);
-					student.setPanNumber(req.getPanNumber());
-					student.setAddress(req.getAddress());
-					student.setDateOfBirth(dob);
-					student.setTransport(req.getTransport().equalsIgnoreCase("yes"));
-					
-					Student savedStudent = studentRepository.save(student);
+	
 					
 
 					FeeStructure feeStructure = feeStructureRepository

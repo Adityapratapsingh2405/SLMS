@@ -125,6 +125,7 @@ public class StudentServiceImpl implements StudentService {
 
 					for (int i = 0; i < 12; i++) {
 						Fee fee = new Fee();
+						fee.setType("monthly");
 						fee.setMonth(FeeMonth.valueOf(currentMonth.getMonth().toString()));
 						fee.setYear(currentMonth.getYear());
 						fee.setStatus(FeeStatus.PENDING);
@@ -145,7 +146,7 @@ public class StudentServiceImpl implements StudentService {
 					fee.setMonth(FeeMonth.JANUARY);
 					fee.setYear(currentMonth.getYear());
 					fee.setStatus(FeeStatus.PENDING);
-					fee.setAmount(feeStructure.getExamAmount());
+					fee.setAmount(feeStructure.getExamAmount()==null?0:feeStructure.getExamAmount());
 					fee.setFeeStructure(feeStructure);
 					fee.setClassEntity(classEntity);
 					fee.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month

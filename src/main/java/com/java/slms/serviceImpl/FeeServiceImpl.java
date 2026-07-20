@@ -253,7 +253,7 @@ public class FeeServiceImpl implements FeeService
         }
         
         // Add Exam Fees
-        List<Fee> examFees = fees.stream().filter(f->f.getType().equals("exam"))
+        List<Fee> examFees = fees.stream().filter(f->f.getType()!=null && f.getType().equals("exam"))
         						.collect(Collectors.toList());
         if(examFees.size()>0)
         {

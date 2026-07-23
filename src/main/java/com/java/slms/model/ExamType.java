@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "exam_type", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Table(name = "exam_type")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,7 +19,7 @@ public class ExamType
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     private String description;

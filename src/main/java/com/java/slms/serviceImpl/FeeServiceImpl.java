@@ -193,7 +193,8 @@ public class FeeServiceImpl implements FeeService
             feeRepository.saveAll(fees);
         }
         //System.out.println("Fees Count : " + fees.size());
-        Map<FeeMonth, Fee> feeMap = fees.stream().collect(Collectors.toMap(Fee::getMonth, Function.identity(), (existing, replacement) -> existing));
+        Map<FeeMonth, Fee> feeMap = fees.stream().filter(f->f.getType().equals("monthly")).collect(Collectors.toMap(Fee::getMonth, Function.identity(), 
+        				(existing, replacement) -> existing));
 
         //System.out.println("Map : " + feeMap.size());
         FeeCatalogDto catalog = new FeeCatalogDto();
@@ -481,5 +482,14 @@ public class FeeServiceImpl implements FeeService
 	    	 
 	    	 feeRepository.save(fee);
 	     });
-	}
+	     
+	     	student.setTransportFees(dto.getTrans());
+			student.setComputerFees(dto.getComp());
+			student.setTuitionFees(dto.getTuit());
+			student.setOtherFees(dto.getOther());
+			student.setFeesAmount(feesAmount);
+			student.setExamAmount(dto.getExam());
+			
+			studentRepository.save(student);
+		}
 }

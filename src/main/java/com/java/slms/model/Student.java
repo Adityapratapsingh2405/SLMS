@@ -94,5 +94,14 @@ public class Student extends BaseEntity
     private School school;
     
     private Boolean transport;
+    
+    private Double transportFees;
+    private Double computerFees;
+    private Double tuitionFees;
+    private Double otherFees;
+    
+    private Double feesAmount;
+    private Double examAmount;
+
 
 }

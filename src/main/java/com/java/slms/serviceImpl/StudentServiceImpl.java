@@ -107,6 +107,14 @@ public class StudentServiceImpl implements StudentService {
 						student.setDateOfBirth(dob);
 						student.setTransport(req.getTransport().equalsIgnoreCase("yes"));
 						
+						FeeStructure feeStr = classEntity.getFeeStructures();
+						student.setTransportFees(feeStr.getTransportFees());
+						student.setComputerFees(feeStr.getComputerFees());
+						student.setTuitionFees(feeStr.getTuitionFees());
+						student.setOtherFees(feeStr.getOtherFees());
+						student.setFeesAmount(feeStr.getFeesAmount());
+						student.setExamAmount(feeStr.getExamAmount());
+						
 						savedStudent = studentRepository.save(student);
 					}
 					
@@ -212,6 +220,9 @@ public class StudentServiceImpl implements StudentService {
 			throw new AlreadyExistException(
 					"Class already exists with name: " + classEntity.getClassName() + " for the selected session.");
 		}
+		
+		
+		
 		Student student = modelMapper.map(studentRequestDto, Student.class);
 		student.setStatus(UserStatus.ACTIVE);
 		student.setClassRollNumber(getNextRollNumber(studentRequestDto.getClassId(), schoolId));
@@ -220,6 +231,14 @@ public class StudentServiceImpl implements StudentService {
 		student.setSchool(school);
 		student.setSession(session);
 		student.setTransport(studentRequestDto.getTransport());
+		
+		FeeStructure feeStr = classEntity.getFeeStructures();
+		student.setTransportFees(feeStr.getTransportFees());
+		student.setComputerFees(feeStr.getComputerFees());
+		student.setTuitionFees(feeStr.getTuitionFees());
+		student.setOtherFees(feeStr.getOtherFees());
+		student.setFeesAmount(feeStr.getFeesAmount());
+		student.setExamAmount(feeStr.getExamAmount());
 
 		// Explicitly set admission date if provided
 		if (studentRequestDto.getAdmissionDate() != null) {

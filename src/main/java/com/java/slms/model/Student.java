@@ -17,7 +17,7 @@ import java.util.List;
 @Table(
         name = "student",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"class_roll_number", "class_id", "session_id"})
+                @UniqueConstraint(columnNames = {"class_roll_number", "class_id", "session_id","school_id"})
         },
         indexes = {
                 @Index(name = "idx_panNumber", columnList = "panNumber"),

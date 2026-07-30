@@ -1,5 +1,6 @@
 package com.java.slms.repository;
 
+import com.java.slms.model.School;
 import com.java.slms.model.Session;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,5 +32,7 @@ public interface SessionRepository extends JpaRepository<Session, Long>
 
     @Query("SELECT s FROM Session s WHERE s.id = :id AND s.school.id = :schoolId AND s.active = true")
     Optional<Session> findActiveSessionByIdAndSchoolId(@Param("id") Long id, @Param("schoolId") Long schoolId);
+
+	Optional<Session> findByNameAndSchool(String sessionName, School school);
 
 }

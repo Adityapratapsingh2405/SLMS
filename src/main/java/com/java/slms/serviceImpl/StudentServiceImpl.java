@@ -47,7 +47,10 @@ public class StudentServiceImpl implements StudentService {
 	@Transactional
 	public String createBulkStudent(StudentBulkRequestDto req, Long schoolId) {
 		try {
-			Optional<Session> opSess = sessionRepository.findByName(req.getSessionName());
+			School school = schoolRepository.findById(schoolId)
+					.orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
+
+			Optional<Session> opSess = sessionRepository.findByNameAndSchool(req.getSessionName(),school);
 			
 			if (opSess.isPresent()) {
 				Session session = opSess.get();
@@ -57,9 +60,7 @@ public class StudentServiceImpl implements StudentService {
 
 				if (opClass.isPresent()) {
 					ClassEntity classEntity = opClass.get();
-					School school = schoolRepository.findById(schoolId)
-							.orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
-
+					
 					User user = fetchUserByPan(req.getPanNumber());
 
 					Optional<Student> existingStudent = studentRepository.findByPanNumberIgnoreCaseAndSchoolIdAndSessionId(

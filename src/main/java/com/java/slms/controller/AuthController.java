@@ -308,13 +308,15 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<RestResponse<AuthResponse>> staffLogin(@RequestBody AuthRequest req) 
 	{
+		System.out.println("0....");
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
 		UserDetails ud = userDetailsService.loadUserByUsername(req.getEmail());
-		
+		System.out.println("1....");
 		CustomUserDetails customUserDetails = (CustomUserDetails) ud;
         Long schoolId = customUserDetails.getSchoolId();
-        
+        System.out.println("2....");
         boolean isActiveSchool = schoolService.isActiveSchool(schoolId);
+        System.out.println("3....");
         if(isActiveSchool) {
         	String token = jwtUtil.generateToken(ud);
     		AuthResponse resp = new AuthResponse(token, "Bearer", 3600);

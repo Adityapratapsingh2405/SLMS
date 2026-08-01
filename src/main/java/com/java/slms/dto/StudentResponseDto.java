@@ -59,4 +59,10 @@ public class StudentResponseDto
     private Date updatedAt;
     private Date deletedAt;
     private Boolean transport;
+    
+    private Double transportFees;
+    private Double computerFees;
+    private Double tuitionFees;
+    private Double otherFees;
+    private Double examAmount;
 }

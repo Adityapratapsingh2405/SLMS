@@ -786,6 +786,11 @@ public class StudentServiceImpl implements StudentService {
 		dto.setSessionId(student.getSession().getId());
 		dto.setSessionName(student.getSession().getName());
 		dto.setTransport(student.getTransport());
+		dto.setTransportFees(student.getTransportFees());
+		dto.setComputerFees(student.getComputerFees());
+		dto.setTuitionFees(student.getTuitionFees());
+		dto.setOtherFees(student.getOtherFees());
+		dto.setExamAmount(student.getExamAmount());
 		// Set school information
 		School school = student.getSchool();
 		if (school != null) {

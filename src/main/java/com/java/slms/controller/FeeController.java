@@ -167,10 +167,10 @@ public class FeeController
         );
     }
     
-    @PutMapping("/editfees/{pan}")
+    @PutMapping("/editfees")
     public ResponseEntity<RestResponse<?>> editFees(@RequestBody EditFeesRequestDTO requestDto,
                                                    @RequestAttribute("schoolId") Long schoolId,
-                                                   @PathVariable(value = "pan") String pan)
+                                                   @RequestParam(value = "pan") String pan)
     {
 
         feeService.editFeesStructure(requestDto, schoolId,pan);

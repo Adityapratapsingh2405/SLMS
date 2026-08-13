@@ -65,4 +65,6 @@ public class StudentResponseDto
     private Double tuitionFees;
     private Double otherFees;
     private Double examAmount;
+    
+    private Double overdueTotal;
 }

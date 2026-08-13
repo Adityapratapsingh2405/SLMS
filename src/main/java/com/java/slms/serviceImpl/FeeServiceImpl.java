@@ -280,8 +280,8 @@ public class FeeServiceImpl implements FeeService
 	        totalAmount+=examFee.getAmount();
         }
         
-        
-        
+        totalAmount = (student.getTransportFees()*12) + (student.getTuitionFees()*12)+(student.getComputerFees()*12)+(student.getOtherFees()*12)+student.getExamAmount();
+        totalPending = totalAmount - totalPaid;
         
         catalog.setMonthlyFees(monthlyFees);
         catalog.setTotalAmount(totalAmount);

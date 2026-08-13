@@ -780,7 +780,8 @@ public class StudentServiceImpl implements StudentService {
 		}
 	}
 
-	private StudentResponseDto convertToDto(Student student) {
+	private StudentResponseDto convertToDto(Student student) 
+	{
 		StudentResponseDto dto = modelMapper.map(student, StudentResponseDto.class);
 		dto.setClassId(student.getCurrentClass().getId());
 		dto.setSessionId(student.getSession().getId());
@@ -834,6 +835,12 @@ public class StudentServiceImpl implements StudentService {
 			}
 			return "overdue".equalsIgnoreCase(fee.getStatus());
 		});
+		
+		double overdue = feeCatalog.getMonthlyFees().stream()
+				.filter(fee->fee.getStatus().equals(FeeStatus.OVERDUE))
+				.collect(Collectors.summingDouble(MonthlyFeeDto::getAmount));
+		
+		dto.setOverdueTotal(overdue);
 
 		// If any fee is overdue, mark student status as OVERDUE
 		if (anyFeeOverdue) {

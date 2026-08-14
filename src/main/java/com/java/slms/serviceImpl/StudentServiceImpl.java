@@ -828,19 +828,27 @@ public class StudentServiceImpl implements StudentService {
 		LocalDate today = LocalDate.now();
 
 		// Check if any fee is overdue (unpaid and past due date)
-		boolean anyFeeOverdue = feeCatalog.getMonthlyFees().stream().anyMatch(fee -> {
-			if ("pending".equalsIgnoreCase(fee.getStatus()) || "unpaid".equalsIgnoreCase(fee.getStatus())) {
-				LocalDate dueDate = fee.getDueDate();
-				return dueDate != null && dueDate.isBefore(today);
-			}
-			return "overdue".equalsIgnoreCase(fee.getStatus());
-		});
+//		boolean anyFeeOverdue = feeCatalog.getMonthlyFees().stream().anyMatch(fee -> {
+//			if ("pending".equalsIgnoreCase(fee.getStatus()) || "unpaid".equalsIgnoreCase(fee.getStatus())) {
+//				LocalDate dueDate = fee.getDueDate();
+//				return dueDate != null && dueDate.isBefore(today);
+//			}
+//			return "overdue".equalsIgnoreCase(fee.getStatus());
+//		});
 		
 		double overdue = feeCatalog.getMonthlyFees().stream()
-				.filter(fee->fee.getStatus().equals(FeeStatus.OVERDUE))
+				.filter(fee->{
+					if ("pending".equalsIgnoreCase(fee.getStatus()) || "unpaid".equalsIgnoreCase(fee.getStatus())) {
+						LocalDate dueDate = fee.getDueDate();
+						return dueDate != null && dueDate.isBefore(today);
+					}
+					return "overdue".equalsIgnoreCase(fee.getStatus());
+				})
 				.collect(Collectors.summingDouble(MonthlyFeeDto::getAmount));
 		
 		dto.setOverdueTotal(overdue);
+		
+		boolean anyFeeOverdue = overdue>0;
 
 		// If any fee is overdue, mark student status as OVERDUE
 		if (anyFeeOverdue) {

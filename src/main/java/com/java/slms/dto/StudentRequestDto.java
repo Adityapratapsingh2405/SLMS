@@ -31,6 +31,7 @@ public class StudentRequestDto
     private FeeCatalogStatus feeCatalogStatus;
 
     private String parentName;
+    private String motherName;
     private String mobileNumber;
 
     private LocalDate dateOfBirth;

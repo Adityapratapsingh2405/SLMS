@@ -42,6 +42,9 @@ public class Student extends BaseEntity
 
     @Column(name = "parent_name")
     private String parentName;
+    
+    @Column(name = "mother_name")
+    private String motherName;
 
     @Column(name = "mobile_number")
     private String mobileNumber;

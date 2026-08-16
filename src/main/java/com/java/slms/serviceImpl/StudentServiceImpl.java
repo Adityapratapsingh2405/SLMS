@@ -97,6 +97,7 @@ public class StudentServiceImpl implements StudentService {
 						student.setMobileNumber(req.getMobile());
 						student.setName(req.getName());
 						student.setParentName(req.getFatherName());
+						student.setMotherName(req.getMotherName());
 						student.setStatus(UserStatus.ACTIVE);
 						student.setClassRollNumber(getNextRollNumber(classEntity.getId(), schoolId));
 						student.setCurrentClass(classEntity);
@@ -232,6 +233,7 @@ public class StudentServiceImpl implements StudentService {
 		student.setSchool(school);
 		student.setSession(session);
 		student.setTransport(studentRequestDto.getTransport());
+		student.setMotherName(studentRequestDto.getMotherName());
 		
 		FeeStructure feeStr = classEntity.getFeeStructures();
 		student.setTransportFees(feeStr.getTransportFees());
@@ -446,6 +448,7 @@ public class StudentServiceImpl implements StudentService {
 		modelMapper.map(updateStudentInfo, fetchedStudent);
 		fetchedStudent.setPanNumber(pan);
 		fetchedStudent.setTransport(updateStudentInfo.getTransport());
+		fetchedStudent.setMotherName(updateStudentInfo.getMotherName());
 
 		// Handle class update - prioritize classId over className
 		boolean classWillChange = false;
@@ -792,6 +795,7 @@ public class StudentServiceImpl implements StudentService {
 		dto.setTuitionFees(student.getTuitionFees());
 		dto.setOtherFees(student.getOtherFees());
 		dto.setExamAmount(student.getExamAmount());
+		dto.setMotherName(student.getMotherName());
 		// Set school information
 		School school = student.getSchool();
 		if (school != null) {

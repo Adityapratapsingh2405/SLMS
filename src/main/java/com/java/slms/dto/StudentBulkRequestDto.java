@@ -27,6 +27,7 @@ public class StudentBulkRequestDto
     private String className;
     private String sessionName;
     private String fatherName;
+    private String motherName;
     private String mobile;
     private String dob;
     private String address;

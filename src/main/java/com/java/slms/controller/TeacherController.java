@@ -114,7 +114,13 @@ public class TeacherController
             @RequestAttribute("schoolId") Long schoolId)
     {
         log.info("Fetching all teachers for school ID: {}", schoolId);
-        List<TeacherDto> teachers = teacherService.getAllTeachers(schoolId);
+        List<TeacherDto> teachers=null;
+        try {
+        	teachers = teacherService.getAllTeachers(schoolId);
+        }catch(Exception ex) {
+        	ex.printStackTrace();
+        }
+        System.out.println("teachers sizs : " + teachers.size());
         return ResponseEntity.ok(
                 RestResponse.<List<TeacherDto>>builder()
                         .data(teachers)

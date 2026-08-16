@@ -16,6 +16,7 @@ public class UpdateStudentInfo
     private String name;
     private String photo;
     private String parentName;
+    private String motherName;
     private String mobileNumber;
     private LocalDate dateOfBirth;
     private Gender gender;

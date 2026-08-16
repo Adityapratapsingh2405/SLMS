@@ -33,6 +33,7 @@ public class StudentResponseDto
     private FeeCatalogStatus feeCatalogStatus;
 
     private String parentName;
+    private String  motherName;
     private String mobileNumber;
     private LocalDate dateOfBirth;
     private Gender gender;

@@ -230,9 +230,9 @@ public class AuthController {
 			userRepository.save(user);
 			req.setUserId(user.getId());
 		}
-		System.out.println("User : " + user);
+		//System.out.println("User : " + user);
 		String res = studentService.createBulkStudent(req, schoolId);
-		System.out.println(res);
+		//System.out.println(res);
 		return ResponseEntity.ok(RestResponse.builder().data(res).message("Students Saved successfully")
 				.status(HttpStatus.OK.value()).build());
 	}

@@ -121,8 +121,9 @@ public class FeeController
 		}
     }
     
-    @PutMapping(value = "/edit/{amt}/{receipt}")
-    public String editFees(@PathVariable(value = "amt") Float amount , @PathVariable(value = "receipt") String receiptNumber) 
+    @PutMapping(value = "/edit")
+    public String editFees(@RequestParam(value = "amt") Float amount , 
+    		@RequestParam(value = "receipt") String receiptNumber) 
     {
     	try {
 			feeService.edit(receiptNumber,amount);

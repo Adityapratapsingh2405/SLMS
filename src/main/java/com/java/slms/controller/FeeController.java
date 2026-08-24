@@ -132,8 +132,8 @@ public class FeeController
 		}
     	
     }
-    @DeleteMapping(value = "/delete/{receipt}")
-    public String delFees(@PathVariable(value = "receipt") String receiptNumber) 
+    @DeleteMapping(value = "/delete")
+    public String delFees(@RequestParam(value = "receipt") String receiptNumber) 
     {
     	feeService.delete(receiptNumber);
     	return "success";

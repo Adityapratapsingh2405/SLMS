@@ -52,8 +52,8 @@ public class ResultsController {
      * Get all exam results for a specific student across all exams
      * This shows a student's complete academic record
      */
-    @GetMapping("/student/{panNumber}")
-    public ResponseEntity<StudentResultsDTO> getStudentAllResults(@PathVariable String panNumber) {
+    @GetMapping("/student")
+    public ResponseEntity<StudentResultsDTO> getStudentAllResults(@RequestParam String panNumber) {
         try {
             StudentResultsDTO results = scoreService.getStudentAllResults(panNumber);
             return ResponseEntity.ok(results);

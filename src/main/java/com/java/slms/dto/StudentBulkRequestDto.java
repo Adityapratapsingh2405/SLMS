@@ -33,5 +33,5 @@ public class StudentBulkRequestDto
     private String address;
     private String transport;
     private Long userId;
-   
+    private Integer previousSessionFees;
 }

@@ -183,6 +183,8 @@ public class AuthController {
 	@Transactional
 	public ResponseEntity<RestResponse<StudentResponseDto>> registerStudent(@RequestBody StudentRequestDto req,
 			@RequestAttribute("schoolId") Long schoolId) {
+		//System.out.println(req);
+		
 		// Check if user with this PEN already exists
 		var existingUserOpt = userRepository.findByPanNumberIgnoreCase(req.getPanNumber());
 

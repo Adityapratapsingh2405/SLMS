@@ -164,8 +164,24 @@ public class StudentServiceImpl implements StudentService {
 					fee.setSchool(school);
 					fee.setSession(session); // Link fee to session
 					feeEntries.add(fee);
-					feeRepository.saveAll(feeEntries);
 					
+					
+					if(req.getPreviousSessionFees()!=null) {
+						Fee f = new Fee();
+						f.setType("pre-session");
+						f.setMonth(FeeMonth.JANUARY);
+						f.setYear(currentMonth.getYear());
+						f.setStatus(FeeStatus.PENDING);
+						f.setAmount(req.getPreviousSessionFees().doubleValue());
+						f.setFeeStructure(feeStructure);
+						f.setClassEntity(classEntity);
+						f.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+						f.setStudent(savedStudent);
+						f.setSchool(school);
+						f.setSession(session); // Link fee to session
+						feeEntries.add(f);
+					}
+					feeRepository.saveAll(feeEntries);
 					
 					StudentEnrollments studentEnrollments = new StudentEnrollments();
 					studentEnrollments.setStudent(savedStudent);
@@ -299,6 +315,22 @@ public class StudentServiceImpl implements StudentService {
 		fee.setSchool(school);
 		fee.setSession(session); // Link fee to session
 		feeEntries.add(fee);
+		
+		if(studentRequestDto.getPreviousSessionFees()!=null) {
+			Fee f = new Fee();
+			f.setType("pre-session");
+			f.setMonth(FeeMonth.JANUARY);
+			f.setYear(currentMonth.getYear());
+			f.setStatus(FeeStatus.PENDING);
+			f.setAmount(studentRequestDto.getPreviousSessionFees().doubleValue());
+			f.setFeeStructure(feeStructure);
+			f.setClassEntity(classEntity);
+			f.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+			f.setStudent(savedStudent);
+			f.setSchool(school);
+			f.setSession(session); // Link fee to session
+			feeEntries.add(f);
+		}
 
 		log.info("FeeEntries : " + feeEntries.size());		
 		feeRepository.saveAll(feeEntries);

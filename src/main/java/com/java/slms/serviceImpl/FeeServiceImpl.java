@@ -63,6 +63,10 @@ public class FeeServiceImpl implements FeeService
         	 fees = feeRepository.findFeesByPanNumberAndSchoolIdAndType(
                      feeRequestDTO.getStudentPanNumber(), schoolId, "exam", session.getId()
              );
+        }else if(feeRequestDTO.getType().equals("pre-session")) {
+       	 fees = feeRepository.findFeesByPanNumberAndSchoolIdAndType(
+                 feeRequestDTO.getStudentPanNumber(), schoolId, "pre-session", session.getId()
+         );
         }else {
         	 fees = feeRepository.findFeesByPanNumberAndSchoolIdAndMonth(
                      feeRequestDTO.getStudentPanNumber(), schoolId, feeRequestDTO.getMonth(), "exam",session.getId()
@@ -279,6 +283,33 @@ public class FeeServiceImpl implements FeeService
 	        }
 	        totalAmount+=examFee.getAmount();
         }
+        
+        // Add PRe-Session Fees
+        List<Fee> preFees = fees.stream().filter(f->f.getType()!=null && f.getType().equals("pre-session"))
+				.collect(Collectors.toList());
+		if(preFees.size()>0)
+		{
+			Fee examFee = preFees.get(0); 
+			MonthlyFeeDto mFee = new MonthlyFeeDto();
+			mFee.setMonth(FeeMonth.JANUARY.name());
+			mFee.setYear(examFee.getYear());
+			mFee.setAmount(examFee.getAmount());
+			mFee.setDueDate(examFee.getDueDate());
+			mFee.setStatus(examFee.getStatus().name().toLowerCase());
+			mFee.setPaymentDate(examFee.getPaymentDate());
+			mFee.setReceiptNumber(examFee.getReceiptNumber());
+			mFee.setType(examFee.getType());
+			monthlyFees.add(0, mFee);
+			
+			switch (examFee.getStatus())
+			{
+			case PAID -> totalPaid += examFee.getAmount();
+			case PENDING -> totalPending += examFee.getAmount();
+			case OVERDUE -> totalOverdue += examFee.getAmount();
+			case UNPAID -> totalPending += examFee.getAmount();
+			}
+			totalAmount+=examFee.getAmount();
+		}
         
         totalAmount = (student.getTransportFees()*12) + (student.getTuitionFees()*12)+(student.getComputerFees()*12)+(student.getOtherFees()*12)+student.getExamAmount();
         totalPending = totalAmount - totalPaid;

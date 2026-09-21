@@ -57,4 +57,5 @@ public class StudentRequestDto
     private Date updatedAt;
 
     private Boolean transport;
+    private Integer previousSessionFees;
 }

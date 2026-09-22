@@ -640,6 +640,30 @@ public class StudentServiceImpl implements StudentService {
 						newFeeEntries.add(fee);
 						currentMonth = currentMonth.plusMonths(1);
 					}
+					
+					// previousSessionFees
+					if(updateStudentInfo.getPreviousSessionFees()!=null) {
+						List<Fee> farr = feeRepository.findFeesByPanNumberAndSchoolIdAndType(pan, schoolId, 
+											"pre-session", newClassId);
+						Fee f = null;
+						if(farr!=null && farr.size()==1)
+							f = farr.get(0);
+						else
+							f = new Fee();
+						
+						f.setType("pre-session");
+						f.setMonth(FeeMonth.JANUARY);
+						f.setYear(currentMonth.getYear());
+						f.setStatus(FeeStatus.PENDING);
+						f.setAmount(updateStudentInfo.getPreviousSessionFees().doubleValue());
+						f.setFeeStructure(newFeeStructure);
+						f.setClassEntity(currentClass);
+						f.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+						f.setStudent(updatedStudent);
+						f.setSchool(updatedStudent.getSchool());
+						f.setSession(activeSession); // Link fee to session
+						newFeeEntries.add(f);
+					}
 
 					feeRepository.saveAll(newFeeEntries);
 					feeRepository.flush();
@@ -650,7 +674,41 @@ public class StudentServiceImpl implements StudentService {
 					// Don't fail the entire update if fee regeneration fails
 				}
 			}
+		}else {
+			School school = schoolRepository.findById(schoolId)
+					.orElseThrow(() -> new ResourceNotFoundException("School not found with ID: " + schoolId));
+			FeeStructure feeStructure = feeStructureRepository
+					.findByClassEntity_IdAndSession_IdAndSchool_Id(updatedStudent.getCurrentClass().getId(), 
+							updatedStudent.getSession().getId(),
+							schoolId)
+					.orElseThrow(() -> new ResourceNotFoundException(
+							"Fee structure not found for in school ID: " + schoolId));
+			// previousSessionFees
+			if(updateStudentInfo.getPreviousSessionFees()!=null) {
+				List<Fee> farr = feeRepository.findFeesByPanNumberAndSchoolIdAndType(pan, schoolId, 
+									"pre-session", newClassId);
+				Fee f = null;
+				if(farr!=null && farr.size()==1)
+					f = farr.get(0);
+				else
+					f = new Fee();
+				LocalDate currentMonth = updatedStudent.getSession().getStartDate().withDayOfMonth(1);
+				f.setType("pre-session");
+				f.setMonth(FeeMonth.JANUARY);
+				f.setYear(currentMonth.getYear());
+				f.setStatus(FeeStatus.PENDING);
+				f.setAmount(updateStudentInfo.getPreviousSessionFees().doubleValue());
+				f.setFeeStructure(feeStructure);
+				f.setClassEntity(updatedStudent.getCurrentClass());
+				f.setDueDate(currentMonth.withDayOfMonth(10)); // Due on 10th of each month
+				f.setStudent(updatedStudent);
+				f.setSchool(updatedStudent.getSchool());
+				f.setSession(updatedStudent.getSession()); // Link fee to session
+				feeRepository.save(f);
+			}
 		}
+		
+		
 
 		log.info("Student updated successfully with PEN: {}", pan);
 

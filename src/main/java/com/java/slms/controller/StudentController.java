@@ -166,12 +166,10 @@ public class StudentController
                     @ApiResponse(responseCode = "400", description = "Invalid request or student inactive", content = @Content)
             }
     )
-    @PutMapping("/{panNumber}")
-    public ResponseEntity<RestResponse<StudentResponseDto>> updateStudent(
-            @PathVariable String panNumber,
+    @PutMapping
+    public ResponseEntity<RestResponse<StudentResponseDto>> updateStudent(@RequestParam String panNumber,
             @RequestBody UpdateStudentInfo updateStudentInfo
-            , @RequestAttribute("schoolId") Long schoolId
-    )
+            , @RequestAttribute("schoolId") Long schoolId)
     {
         RestResponse<StudentResponseDto> response = RestResponse.<StudentResponseDto>builder()
                 .data(studentService.updateStudent(panNumber, updateStudentInfo, schoolId))

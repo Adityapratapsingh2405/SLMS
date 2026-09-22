@@ -27,4 +27,5 @@ public class UpdateStudentInfo
     private String className; // Format: "1-A", "10-B", etc.
     private Long classId; // Direct class ID if provided
     private Boolean transport;
+    private Double previousSessionFees;
 }

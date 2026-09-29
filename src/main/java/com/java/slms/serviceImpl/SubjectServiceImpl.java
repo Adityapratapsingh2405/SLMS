@@ -8,13 +8,17 @@ import com.java.slms.exception.ResourceNotFoundException;
 import com.java.slms.exception.WrongArgumentException;
 import com.java.slms.model.ClassEntity;
 import com.java.slms.model.School;
+import com.java.slms.model.SelectedSubject;
 import com.java.slms.model.Subject;
 import com.java.slms.model.Teacher;
 import com.java.slms.repository.ClassEntityRepository;
 import com.java.slms.repository.SchoolRepository;
+import com.java.slms.repository.SelectedSubjectRepo;
 import com.java.slms.repository.SubjectRepository;
 import com.java.slms.repository.TeacherRepository;
 import com.java.slms.service.SubjectService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -34,6 +38,7 @@ public class SubjectServiceImpl implements SubjectService
     private final ModelMapper modelMapper;
     private final TeacherRepository teacherRepository;
     private final SchoolRepository schoolRepository;
+    private final SelectedSubjectRepo selectedSubjectRepo;
 
     @Override
     public SubjectDto addSubject(SubjectDto subjectDto, Long schoolId)
@@ -278,5 +283,24 @@ public class SubjectServiceImpl implements SubjectService
         dto.setSchoolId(subject.getSchool().getId());
         return dto;
     }
+
+    @Transactional
+    @Override
+    public void saveSelectedSubjects(List<SelectedSubject> records, Long schoolId) {
+
+        selectedSubjectRepo.deleteAllBySchoolId(schoolId);
+
+        for (SelectedSubject sub : records) {
+            sub.setId(null);
+            sub.setSchoolId(schoolId);
+
+            selectedSubjectRepo.save(sub);
+        }
+    }
+
+	@Override
+	public List<SelectedSubject> listSelectedSubjects(Long schoolId) {
+		return selectedSubjectRepo.findAllBySchoolId(schoolId);
+	}
 
 }

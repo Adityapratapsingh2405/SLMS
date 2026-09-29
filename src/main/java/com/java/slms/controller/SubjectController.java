@@ -2,6 +2,7 @@ package com.java.slms.controller;
 
 import com.java.slms.dto.SubjectDto;
 import com.java.slms.dto.SubjectsBulkDto;
+import com.java.slms.model.SelectedSubject;
 import com.java.slms.payload.RestResponse;
 import com.java.slms.service.SubjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +27,24 @@ public class SubjectController
 {
 
     private final SubjectService subjectService;
+    
+    
+    @PostMapping("/save-selected-subjects")
+    public ResponseEntity<String> saveSelectedSubjects(@RequestBody List<SelectedSubject> records,
+            @RequestAttribute("schoolId") Long schoolId)
+    {
+    	System.out.println(records);
+    	subjectService.saveSelectedSubjects(records,schoolId);
+    	return ResponseEntity.ok("success");
+    }
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @GetMapping("/list-selected-subjects")
+    public ResponseEntity<List<SelectedSubject>> listSelectedSubjects(@RequestAttribute("schoolId") Long schoolId)
+    {
+    	System.out.println(schoolId);
+    	List<SelectedSubject> records = subjectService.listSelectedSubjects(schoolId);
+    	return ResponseEntity.ok(records);
+    }
 
     @Operation(
             summary = "Add a new subject",

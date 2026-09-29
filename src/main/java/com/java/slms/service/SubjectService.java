@@ -2,6 +2,7 @@ package com.java.slms.service;
 
 import com.java.slms.dto.SubjectDto;
 import com.java.slms.dto.SubjectsBulkDto;
+import com.java.slms.model.SelectedSubject;
 
 import java.util.List;
 
@@ -21,4 +22,8 @@ public interface SubjectService
     SubjectDto updateSubjectInfoById(Long subjectId, SubjectDto subjectDto, Long schoolId);
 
     void deleteSubject(Long subjectId, Long schoolId);
+
+	void saveSelectedSubjects(List<SelectedSubject> records, Long schoolId);
+
+	List<SelectedSubject> listSelectedSubjects(Long schoolId);
 }

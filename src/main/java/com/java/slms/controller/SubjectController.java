@@ -1,5 +1,6 @@
 package com.java.slms.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.slms.dto.SubjectDto;
 import com.java.slms.dto.SubjectsBulkDto;
 import com.java.slms.model.SelectedSubject;
@@ -11,11 +12,19 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 @RestController
@@ -27,7 +36,8 @@ public class SubjectController
 {
 
     private final SubjectService subjectService;
-    
+    @Value("${upload.notespath}")
+    private String uploadDirPath;
     
     @PostMapping("/save-selected-subjects")
     public ResponseEntity<String> saveSelectedSubjects(@RequestBody List<SelectedSubject> records,
@@ -37,6 +47,75 @@ public class SubjectController
     	subjectService.saveSelectedSubjects(records,schoolId);
     	return ResponseEntity.ok("success");
     }
+    
+    @PostMapping("/save-notes")
+    public ResponseEntity<String> saveNotes(@RequestBody String notes,
+            @RequestAttribute("schoolId") Long schoolId)
+    {
+    	System.out.println(notes);
+    	  try {
+    	        // Create directory if it doesn't exist
+    	        Path uploadPath = Paths.get(uploadDirPath);
+
+    	        if (!Files.exists(uploadPath)) {
+    	            Files.createDirectories(uploadPath);
+    	        }
+
+    	        // File name based on schoolId
+    	        Path filePath = uploadPath.resolve(schoolId + ".json");
+    	        
+    	        if(Files.exists(filePath)) {
+    	        	Files.delete(filePath);
+    	        }
+
+    	        // Save JSON content
+    	        Files.writeString(
+    	                filePath,
+    	                notes,
+    	                StandardCharsets.UTF_8,
+    	                StandardOpenOption.CREATE,
+    	                StandardOpenOption.TRUNCATE_EXISTING
+    	        );
+
+    	        System.out.println("Notes saved: " + filePath);
+
+    	        return ResponseEntity.ok("success");
+
+    	    } catch (IOException e) {
+    	        e.printStackTrace();
+    	        return ResponseEntity
+    	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+    	                .body("Failed to save notes");
+    	    }
+    }
+    
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @GetMapping("/get-notes")
+    public ResponseEntity<String> getNotes(@RequestAttribute("schoolId") Long schoolId)
+    {
+    	try {
+
+            Path filePath = Paths.get(uploadDirPath, schoolId + ".json");
+
+            if (!Files.exists(filePath)) {
+            	return ResponseEntity.ok("no");
+            }
+
+            String json = Files.readString(
+                    filePath,
+                    StandardCharsets.UTF_8
+            );
+
+            return ResponseEntity.ok(json);
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity.ok("no");
+        }
+    }
+    
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @GetMapping("/list-selected-subjects")
     public ResponseEntity<List<SelectedSubject>> listSelectedSubjects(@RequestAttribute("schoolId") Long schoolId)

@@ -26,8 +26,8 @@ public class DbConnectionConfig
     	  String host = "localhost";
           String port = "3306";
           String dbName = "slms";
-          String username = "gourav";
-          String password = "Gourav@123";
+          String username = "root";
+          String password = "root";
 
         String url = JDBC_PREFIX + host + ":" + port + "/" + dbName;
 

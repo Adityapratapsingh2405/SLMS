@@ -217,9 +217,12 @@ public class AttendanceController
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     public ResponseEntity<RestResponse<AttendanceDto>> getAttendanceByClassAndDate(
             @PathVariable Long classId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate date,
             @RequestAttribute("schoolId") Long schoolId)
     {
+    	System.out.println("date : "  + date);
         AttendanceDto attendance = attendanceService.getAttendanceByClassAndDate(classId, date, schoolId);
         
         if (attendance == null)

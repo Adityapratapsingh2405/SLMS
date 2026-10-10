@@ -46,9 +46,16 @@ public class AttendanceServiceImpl implements AttendanceService
     @Transactional
     public void markTodaysAttendance(AttendanceDto attendanceDto, Long schoolId)
     {
-        LocalDate today = LocalDate.now();
-        LocalDateTime dayStart = today.atStartOfDay();
-        LocalDateTime dayEnd = dayStart.plusDays(1);
+        LocalDate today = null;
+        if(attendanceDto.getDate()==null)
+        	today = LocalDate.now();
+        else
+        	today = attendanceDto.getDate();
+        
+        System.out.println("MArkDate : " + today);
+        
+        LocalDate dayStart = today;
+        LocalDate dayEnd = dayStart.plusDays(1);
 
         List<StudentAttendance> inputAttendances = attendanceDto.getStudentAttendances();
         if (inputAttendances == null || inputAttendances.isEmpty())
@@ -122,9 +129,9 @@ public class AttendanceServiceImpl implements AttendanceService
                 log.info("Updated attendance for student PEN '{}' to present={}", panNumber, sa.isPresent());
                 continue;
             }
-
+            System.out.println("Att not found : " + today);
             Attendance attendance = new Attendance();
-            attendance.setDate(LocalDateTime.now());
+            attendance.setDate(today);
             attendance.setStudent(student);
             attendance.setPresent(sa.isPresent());
             attendance.setSession(activeSession);
@@ -170,8 +177,8 @@ public class AttendanceServiceImpl implements AttendanceService
 
             Student student = fetchedStudent.get();
 
-            LocalDateTime dayStart = attendanceDate.atStartOfDay();
-            LocalDateTime dayEnd = attendanceDate.plusDays(1).atStartOfDay();
+            LocalDate dayStart = attendanceDate.atStartOfDay().toLocalDate();
+            LocalDate dayEnd = attendanceDate.plusDays(1).atStartOfDay().toLocalDate();
 
             Optional<Attendance> attendanceOpt = attendanceRepository.findByStudentAndDateBetweenAndSchoolId(student, dayStart, dayEnd, schoolId);
 
@@ -352,8 +359,8 @@ public class AttendanceServiceImpl implements AttendanceService
     @Override
     public AttendanceDto getAttendanceByClassAndDate(Long classId, LocalDate date, Long schoolId)
     {
-        LocalDateTime dayStart = date.atStartOfDay();
-        LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
+        LocalDate dayStart = date.atStartOfDay().toLocalDate();
+        LocalDate dayEnd = date.plusDays(1).atStartOfDay().toLocalDate();
 
         // Find the class entity
         ClassEntity classEntity = classEntityRepository.findById(classId)

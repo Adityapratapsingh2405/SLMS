@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +16,12 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>
 {
     @Query("SELECT a FROM Attendance a " +
             "WHERE a.student = :student " +
-            "AND a.date BETWEEN :start AND :end " +
+            "AND a.date=:start " +
             "AND a.school.id = :schoolId")
     Optional<Attendance> findByStudentAndDateBetweenAndSchoolId(
             @Param("student") Student student,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
+            @Param("start") LocalDate start ,
+            @Param("end") LocalDate end,
             @Param("schoolId") Long schoolId);
 
     @Query("SELECT a FROM Attendance a " +
@@ -29,8 +30,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>
             "AND a.school.id = :schoolId")
     List<Attendance> findByClassEntityAndDateBetweenAndSchoolId(
             @Param("classEntity") ClassEntity classEntity,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end,
             @Param("schoolId") Long schoolId);
 
     // With month filtering
